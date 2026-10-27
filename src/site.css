@@ -36,7 +36,7 @@ section{padding-block:clamp(64px,10vw,140px)}
 /* header */
 header.top{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:16px;mix-blend-mode:difference;color:#fff}
 .logo{display:block;text-decoration:none}
-.logo img{height:clamp(30px,3.4vw,40px);width:auto}
+.logo img{height:clamp(22px,2.4vw,30px);width:auto;margin-left:-0.6%}
 .hnav{display:flex;gap:26px;align-items:center}
 .hnav a{text-decoration:none;font-size:var(--s-s)}
 .hnav a:hover,.hnav a[aria-current]{text-decoration:underline;text-underline-offset:4px}

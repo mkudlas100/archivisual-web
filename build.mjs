@@ -60,24 +60,10 @@ async function images() {
   // statické fotky (studie)
   await fs.cp("static", OUT, { recursive: true });
   for (const f of await fs.readdir(path.join(OUT, "img/studie"))) await measure("img/studie/" + f);
-  // logo: bílé, bez poloprůhledného rámečku
-  try {
-    const r = await fetch(LOGO_SRC); if (!r.ok) throw new Error(r.status);
-    const buf = Buffer.from(await r.arrayBuffer());
-    if (sharp) {
-      const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-      for (let i = 0; i < data.length; i += 4) { const a = data[i + 3]; data[i] = data[i + 1] = data[i + 2] = 255; data[i + 3] = a > 200 ? 255 : a > 150 ? Math.round((a - 150) * 5) : 0; }
-      const clean = sharp(data, { raw: info }).trim({ threshold: 1 });
-      await write("img/logo.png", await clean.clone().resize({ height: 120 }).png().toBuffer());
-      try { await write("favicon.png", await sharp(path.join(OUT, "img/logo.png")).extract({ left: 0, top: 0, width: 120, height: 120 }).resize(64, 64, { fit: "contain", background: "#17191B" }).flatten({ background: "#17191B" }).png().toBuffer()); } catch (e) { console.warn("Favicon:", e.message); }
-      if (false) await write("favicon.png", await sharp(data, { raw: info }).extract({ left: 0, top: 0, width: Math.round(info.width * 0.24), height: info.height }).trim({ threshold: 1 }).resize(64, 64, { fit: "contain", background: { r: 23, g: 25, b: 27, alpha: 1 } }).flatten({ background: "#17191B" }).png().toBuffer());
-    } else await write("img/logo.png", buf);
-  } catch (e) {
-    console.warn("Logo nestaženo:", e.message);
-    await write("img/logo.svg", `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="60"><text x="0" y="44" fill="#fff" font-family="Arial" font-size="44">Archivisual</text></svg>`);
-  }
+  // logo D1 (široké verzálky) je ve static/img/logo.svg; ikona z favicon.svg
+  if (sharp) { try { await write("favicon.png", await sharp(path.join(OUT, "favicon.svg"), { density: 300 }).resize(64, 64).png().toBuffer()); await write("apple-touch-icon.png", await sharp(path.join(OUT, "favicon.svg"), { density: 300 }).resize(180, 180).png().toBuffer()); } catch (e) { console.warn("Favicon:", e.message); } }
 }
-const logoSrc = async () => { try { await fs.access(path.join(OUT, "img/logo.png")); return "/img/logo.png"; } catch { return "/img/logo.svg"; } };
+const logoSrc = async () => "/img/logo.svg";
 const wh = f => dims[f] ? ` width="${dims[f][0]}" height="${dims[f][1]}"` : "";
 
 /* ---------- strukturovaná data ---------- */
@@ -108,7 +94,7 @@ async function page({ path: p, title, desc, body, schema = "", image = "/img/og.
 ${NOINDEX ? '<meta name="robots" content="noindex, nofollow">' : ""}
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${SITE.url}${image}"><meta property="og:locale" content="cs_CZ"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/favicon.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.png" sizes="64x64"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,200..700&display=swap">
 <link rel="stylesheet" href="/assets/site.css?v=${BUILD_DATE}">
@@ -119,7 +105,7 @@ ${schema}
 ${home ? '<div class="pre" id="pre" aria-hidden="true"><span>Archivisual – vizualizace od roku ' + SITE.since + '</span><b id="preN">000</b></div>' : ""}
 <div class="cur" id="cur" aria-hidden="true"><em>Zobrazit</em></div>
 <header class="top wrap">
-  <a class="logo" href="/" aria-label="Archivisual – úvod"><img src="${logo}" alt="Archivisual" height="40"></a>
+  <a class="logo" href="/" aria-label="Archivisual – úvod"><img src="${logo}" alt="Archivisual" width="232" height="30"></a>
   <nav class="hnav" aria-label="Hlavní">
     ${NAV.map(([u, l]) => `<a class="hl" href="${u}"${cur === u ? ' aria-current="page"' : ""}>${l}</a>`).join("")}
     <a class="hl" href="#kontakt">Poptat projekt</a>
@@ -127,7 +113,7 @@ ${home ? '<div class="pre" id="pre" aria-hidden="true"><span>Archivisual – viz
   </nav>
 </header>
 <div class="menu wrap" id="menu" role="dialog" aria-modal="true" aria-label="Menu">
-  <div class="mtop"><img src="${logo}" alt="" height="36"><button class="btn-menu" id="menuClose">Zavřít</button></div>
+  <div class="mtop"><img src="${logo}" alt="" width="232" height="30"><button class="btn-menu" id="menuClose">Zavřít</button></div>
   <nav>
     <a href="/">Úvod</a>
     <a href="/portfolio">Práce <small>${WORK.length}</small></a>
