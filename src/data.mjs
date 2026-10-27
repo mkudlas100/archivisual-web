@@ -111,7 +111,7 @@ export const WORK = RAW.map((r, i) => ({
   t: r[1], k: r[2], y: r[3], c: r[4], home: !!r[5],
 }));
 
-export const HERO = [0, 4, 15, 21, 31];
+export const HERO = [1, 21, 4, 28, 26];
 
 export const SERVICES = [
   ["Exteriérové vizualizace", "Budovy a krajina ve všech fázích projektu, od soutěžního návrhu po prodejní kampaň. Hlídáme každý detail i denní dobu, která stavbě nejvíc sluší."],

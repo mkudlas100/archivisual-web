@@ -10,7 +10,7 @@ import { STUDIES } from "./src/studies.mjs";
 const OUT = "dist";
 const NOINDEX = process.env.NOINDEX !== "0"; // do spuštění ostrého webu zakázat indexování
 const HOST = process.env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + process.env.VERCEL_PROJECT_PRODUCTION_URL : SITE.url;
-const HOME_BEST = [0, 1, 3, 4, 21, 31, 15, 26, 24, 8]; // 10 projektů viditelných na úvodu
+const HOME_BEST = [2, 4, 5, 6, 8, 13, 17, 22, 27, 29, 31, 34, 39, 40, 42, 44, 45, 56].map(n => n - 1); // výběr klienta (složka Foto/top 10), čísla AV
 const POSTS = [...NEW_POSTS, ...OLD_POSTS];
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 
@@ -232,7 +232,7 @@ async function home() {
   <div class="stage-cap"><span id="stageCap">${esc(WORK[HERO[0]].t + " — " + meta(WORK[HERO[0]]))}</span><span class="dots" id="stageDots">${HERO.map((_, n) => `<button aria-label="Snímek ${n + 1}"${n ? "" : ' class="on"'}></button>`).join("")}</span></div>
 </section>
 <section class="wrap"><div class="intro rv"><h2>Co děláme</h2><p class="big">${nb("Jsme tým architektů a grafiků. Pomáháme vyprávět příběh projektu světlem, kompozicí a pohledem člověka,")} <em>${nb("který v domě bude jednou žít.")}</em></p></div></section>
-<section class="wrap" id="prace" style="padding-top:0">${gallery(items, { more: 10, list: false })}</section>
+<section class="wrap" id="prace" style="padding-top:0">${gallery(items, { more: HOME_BEST.length, list: false })}</section>
 <section class="wrap" id="studie" style="padding-top:0">
   <p class="sec-h">Případové studie</p>
   <a class="case rv" href="/studie/${k.slug}"><div class="media"><img loading="lazy" src="/img/studie/kosicka-007.jpg" alt="Vnitřní dvůr rezidence Košická ve zlaté hodině"></div><div><p class="kick">${k.kicker}</p><h3>${k.title}</h3><p>${nb(k.lead)} ${nb("Osm vizualizací se scénami ze života obyvatel.")}</p><span class="btn">Prohlédnout studii</span></div></a>
