@@ -9,13 +9,15 @@ desc: "Cena 3D vizualizace domu, bytu nebo developerského projektu závisí na 
 img: "/img/studie/kosicka-006.jpg",
 tags: ["Ceny", "Developeři"],
 faq: [
-  ["Kolik stojí jedna vizualizace?", "Cena se odvíjí od náročnosti scény, kvality podkladů a počtu pohledů ze stejné scény. Další pohled z již připraveného modelu bývá výrazně levnější než první. Přesnou cenu vám pošleme po zaslání podkladů."],
+  ["Kolik stojí jedna vizualizace?", "Exteriér rodinného domu začíná na 9 000 Kč za první pohled, další pohled ze stejné scény na 3 000 Kč. Interiér začíná na 6 000 Kč za pohled. Ceny jsou orientační a bez DPH; přesnou cenu pošleme po zaslání podkladů."],
   ["Je levnější exteriér, nebo interiér?", "Záleží na rozsahu. Jednoduchý exteriér rodinného domu může být méně náročný než detailní interiér s mnoha materiály a vybavením. Velký obytný soubor s okolím je naopak náročnější než jeden pokoj."],
   ["Co potřebujete, abyste mohli poslat cenu?", "Stačí výkresy nebo 3D model, představa o počtu a typu pohledů, k čemu budou vizualizace sloužit a termín."],
 ],
 body: `
-<p class="lead">Cena 3D vizualizace se nedá říct jedním číslem. Rozhoduje hlavně kvalita podkladů, počet pohledů, úroveň detailu a k čemu budou obrázky sloužit. U developerských projektů se rozpočet na vizualizace obvykle pohybuje v řádu desítek tisíc korun a tvoří jen malou část celkových nákladů projektu.</p>
-<p>Níže najdete, co cenu nejvíc ovlivňuje a jak ji můžete snížit, aniž byste slevili z kvality.</p>
+<p class="lead">Exteriér rodinného domu u nás začíná na 9 000 Kč za první pohled, bytový dům na 15 000 Kč a interiér na 6 000 Kč za pohled (bez DPH). Konečná cena záleží na kvalitě podkladů, počtu pohledů, úrovni detailu a na tom, k čemu budou obrázky sloužit.</p>
+<h2>Orientační ceník</h2>
+{{CENIK}}
+<p>Níže najdete, co cenu nejvíc ovlivňuje a jak ji můžete snížit, aniž byste slevili z kvality. Aktuální ceny jsou vždy na stránce <a href="/cenik">Ceník</a>.</p>
 <h2>Co ovlivňuje cenu vizualizace</h2>
 <h3>1. Podklady</h3>
 <p>Nejlevnější je začít z hotového 3D modelu, například z Archicadu nebo Revitu. Když máme jen 2D výkresy, musíme model nejdřív postavit. I hotový model často doplňujeme o detaily fasády, zábradlí, terén nebo okolí, aby obstál v detailním záběru.</p>

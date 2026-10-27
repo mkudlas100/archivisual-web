@@ -2,7 +2,7 @@
 // Na Vercelu si skript stáhne fotky ze současného úložiště (becdn) a uloží je k webu.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { SITE, CDN, LOGO_SRC, CATS, WORK, HERO, SERVICES, CLIENTS, TESTIMONIALS } from "./src/data.mjs";
+import { SITE, CDN, LOGO_SRC, CATS, WORK, HERO, SERVICES, CLIENTS, TESTIMONIALS, PRICES } from "./src/data.mjs";
 import { OLD_POSTS } from "./src/posts-old.mjs";
 import { NEW_POSTS } from "./src/posts-new.mjs";
 import { STUDIES } from "./src/studies.mjs";
@@ -69,7 +69,8 @@ async function images() {
       for (let i = 0; i < data.length; i += 4) { const a = data[i + 3]; data[i] = data[i + 1] = data[i + 2] = 255; data[i + 3] = a > 200 ? 255 : a > 150 ? Math.round((a - 150) * 5) : 0; }
       const clean = sharp(data, { raw: info }).trim({ threshold: 1 });
       await write("img/logo.png", await clean.clone().resize({ height: 120 }).png().toBuffer());
-      await write("favicon.png", await sharp(data, { raw: info }).extract({ left: 0, top: 0, width: Math.round(info.width * 0.24), height: info.height }).trim({ threshold: 1 }).resize(64, 64, { fit: "contain", background: { r: 23, g: 25, b: 27, alpha: 1 } }).flatten({ background: "#17191B" }).png().toBuffer());
+      try { await write("favicon.png", await sharp(path.join(OUT, "img/logo.png")).extract({ left: 0, top: 0, width: 120, height: 120 }).resize(64, 64, { fit: "contain", background: "#17191B" }).flatten({ background: "#17191B" }).png().toBuffer()); } catch (e) { console.warn("Favicon:", e.message); }
+      if (false) await write("favicon.png", await sharp(data, { raw: info }).extract({ left: 0, top: 0, width: Math.round(info.width * 0.24), height: info.height }).trim({ threshold: 1 }).resize(64, 64, { fit: "contain", background: { r: 23, g: 25, b: 27, alpha: 1 } }).flatten({ background: "#17191B" }).png().toBuffer());
     } else await write("img/logo.png", buf);
   } catch (e) {
     console.warn("Logo nestaženo:", e.message);
@@ -93,7 +94,7 @@ const ld = (...nodes) => `<script type="application/ld+json">${JSON.stringify({ 
 const crumbsLd = items => ({ "@type": "BreadcrumbList", itemListElement: items.map(([n, u], i) => ({ "@type": "ListItem", position: i + 1, name: n, item: SITE.url + u })) });
 
 /* ---------- šablona ---------- */
-const NAV = [["/portfolio", "Práce"], ["/#studie", "Studie"], ["/#sluzby", "Služby"], ["/blog-archivisual", "Blog"]];
+const NAV = [["/portfolio", "Práce"], ["/#studie", "Studie"], ["/#sluzby", "Služby"], ["/cenik", "Ceník"], ["/blog-archivisual", "Blog"]];
 async function page({ path: p, title, desc, body, schema = "", image = "/img/og.jpg", home = false, cur = "" }) {
   const logo = await logoSrc();
   const canonical = SITE.url + (p === "/" ? "/" : p);
@@ -133,6 +134,7 @@ ${home ? '<div class="pre" id="pre" aria-hidden="true"><span>Archivisual – viz
     <a href="/studie/kosicka-courtyard">Košická Courtyard</a>
     <a href="/studie/vrsovice-interier">Byt ve Vršovicích</a>
     <a href="/#sluzby">Služby</a>
+    <a href="/cenik">Ceník</a>
     <a href="/blog-archivisual">Blog <small>${POSTS.length}</small></a>
     <a href="#kontakt">Kontakt</a>
   </nav>
@@ -211,6 +213,8 @@ function gallery(items, { more = 0, list = true, heading = "h2", title = "Práce
 }
 const postCard = p => `<a class="post" href="/${p.slug}"><div class="ph"><img loading="lazy" decoding="async" src="${blogImg(p)}" alt=""></div><span class="tg">${p.tags.join(" · ")}</span><h3>${nb(esc(p.title))}</h3><p>${nb(esc(p.desc))}</p></a>`;
 
+const priceTable = () => `<div class="prices">${PRICES.map(([n, c, d]) => `<div class="pr"><div><h3>${n}</h3><p class="muted">${nb(d)}</p></div><b>${c.replace(/ (?=\d{3})/g, "\u00A0").replace(" Kč", "\u00A0Kč")}</b></div>`).join("")}</div><p class="muted" style="margin-top:16px;font-size:var(--s-s)">${nb("Ceny jsou orientační a bez DPH. Přesnou cenu pošleme po zaslání podkladů; záleží na modelu, počtu pohledů, detailu a termínu.")}</p>`;
+
 /* ---------- stránky ---------- */
 async function home() {
   const order = [...HOME_BEST, ...WORK.map((_, i) => i).filter(i => !HOME_BEST.includes(i))];
@@ -237,6 +241,7 @@ async function home() {
 <section class="wrap" id="sluzby" style="padding-top:0">
   <div class="two-col rv" style="margin-bottom:clamp(32px,5vw,64px)"><h2>Služby</h2><p class="big" style="font-size:var(--s-l);max-width:40ch">${nb("Od první skici po prodejní kampaň. Každou zakázku stavíme na míru, ať jde o jeden pokoj, nebo celý obytný soubor.")}</p></div>
   <div class="svc">${SERVICES.map((s, i) => `<details${i ? "" : " open"}><summary><h3>${s[0]}</h3><i aria-hidden="true">+</i></summary><div class="body"><span></span><div><p>${nb(s[1])}</p>${s[2] ? `<a href="${s[2]}">Více o službě</a>` : ""}</div></div></details>`).join("")}</div>
+  <p style="margin-top:28px"><a class="btn" href="/cenik">Orientační ceník</a></p>
   <div class="dev">
     <div><h3>Developerský servis</h3><p class="muted">${nb("Kromě vizualizací pomáháme s prodejem malých i velkých projektů.")}</p></div>
     <div><h3>Web a SEO</h3><p>${nb("Přehledná prezentace nemovitosti a bytových jednotek. Postaráme se, aby byl web vidět.")}</p></div>
@@ -311,7 +316,7 @@ async function post(p) {
 <div class="wrap"><div class="art-hero"><img src="${blogImg(p)}" alt="${esc(p.title)}" fetchpriority="high"></div></div>
 <article class="art wrap">
   <p class="meta">Matěj Kudlička, 3D artist${date ? " · " + date : ""} · ${p.tags.join(", ")}</p>
-  <div class="prose">${nb(p.body)}</div>
+  <div class="prose">${nb(p.body).replace("{{CENIK}}", priceTable())}</div>
   ${p.faq ? `<div class="faq"><h2 class="sec-h" style="margin:24px 0 8px">Časté otázky</h2>${p.faq.map(([q, a]) => `<details><summary>${nb(q)}</summary><p>${nb(a)}</p></details>`).join("")}</div>` : ""}
   <div class="author"><div><b>Matěj Kudlička</b><br><span class="muted">3D artist, Archivisual. Studio tvoří vizualizace od roku ${SITE.since}.</span></div></div>
   <div class="cta-box"><h2>Chystáte projekt?</h2><p>${nb("Pošlete nám výkresy nebo model a připravíme nabídku na míru.")}</p><a class="btn solid" href="#kontakt" style="justify-self:start">Poptat vizualizaci</a></div>
@@ -321,6 +326,17 @@ async function post(p) {
     { "@type": "BlogPosting", headline: p.title, description: p.desc, image: SITE.url + blogImg(p), inLanguage: "cs", ...(p.date ? { datePublished: p.date, dateModified: p.date } : {}), author: { "@type": "Person", name: "Matěj Kudlička", jobTitle: "3D artist", worksFor: { "@id": SITE.url + "/#studio" } }, publisher: { "@id": SITE.url + "/#studio" }, mainEntityOfPage: SITE.url + url }];
   if (p.faq) nodes.push({ "@type": "FAQPage", mainEntity: p.faq.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) });
   return page({ path: url, cur: "/blog-archivisual", title: `${p.title} | Archivisual`, desc: p.desc, body, image: blogImg(p), schema: ld(...nodes) });
+}
+
+async function cenik() {
+  const body = `<section class="wrap" style="padding-top:calc(130px + env(safe-area-inset-top,0px))">
+  <nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>Ceník</span></nav>
+  <div class="two-col"><h1 class="big">Ceník 3D vizualizací</h1><div><p style="font-size:var(--s-l);font-weight:300">${nb("Orientační ceny našich služeb. Každá zakázka je jiná, proto vám po zaslání podkladů pošleme přesnou nabídku.")}</p></div></div>
+  <div style="margin-top:clamp(32px,5vw,64px)">${priceTable()}</div>
+  <div class="cta-box" style="max-width:42rem"><h2>Co cenu ovlivňuje</h2><p>${nb("Kvalita podkladů, počet pohledů, úroveň detailu, letecké záběry, počet kol připomínek a termín.")} <a href="/kolik-stoji-3d-vizualizace">Podrobně v článku</a>.</p><a class="btn solid" href="#kontakt" style="justify-self:start">Poptat přesnou cenu</a></div>
+</section>`;
+  return page({ path: "/cenik", cur: "/cenik", title: "Ceník 3D vizualizací | Archivisual", desc: "Orientační ceny 3D vizualizací: exteriér rodinného domu od 9 000 Kč, bytový dům od 15 000 Kč, interiér od 6 000 Kč, virtuální prohlídka, animace. Studio Archivisual, Praha.", body,
+    schema: ld(crumbsLd([["Úvod", "/"], ["Ceník", "/cenik"]]), { "@type": "OfferCatalog", name: "Ceník 3D vizualizací", itemListElement: PRICES.map(([n, c, d]) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: n, description: d }, priceSpecification: { "@type": "PriceSpecification", minPrice: Number(c.replace(/\D/g, "")), priceCurrency: "CZK", valueAddedTaxIncluded: false } })) }) });
 }
 
 async function simple(p, title, h, text) {
@@ -338,12 +354,13 @@ if (sharp) { try { await write("img/og.jpg", await sharp(path.join(OUT, full(WOR
 await write("index.html", await home());
 await write("portfolio.html", await portfolio());
 for (const s of STUDIES) await write(`studie/${s.slug}.html`, await study(s));
+await write("cenik.html", await cenik());
 await write("blog-archivisual.html", await blogIndex());
 for (const p of POSTS) await write(`${p.slug}.html`, await post(p));
 await write("dekujeme.html", await simple("/dekujeme", "Děkujeme", "Děkujeme, poptávka je odeslaná", "Ozveme se vám s cenou a termínem. Pokud spěcháte, zavolejte nám."));
 await write("404.html", await simple("/404", "Stránka nenalezena", "Tuhle stránku jsme nenašli", "Možná se přesunula. Zkuste galerii, blog, nebo nám napište."));
 
-const urls = ["/", "/portfolio", ...STUDIES.map(s => "/studie/" + s.slug), "/blog-archivisual", ...POSTS.map(p => "/" + p.slug)];
+const urls = ["/", "/portfolio", "/cenik", ...STUDIES.map(s => "/studie/" + s.slug), "/blog-archivisual", ...POSTS.map(p => "/" + p.slug)];
 await write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE.url}${u}</loc><lastmod>${BUILD_DATE}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 await write("robots.txt", NOINDEX ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
 await write("llms.txt", `# Archivisual\n\n> Pražské studio architektonických 3D vizualizací (od roku ${SITE.since}), Šaldova 544/6, Praha 8 – Karlín. Exteriérové a interiérové vizualizace, animace, letecké záběry a fotozákresy, virtuální prohlídky 360°, produktové vizualizace a developerský servis.\n\n- Kontakt: ${SITE.email}, ${SITE.phones.map(p => p.label + " (" + p.who + ")").join(", ")}\n- [Galerie](${SITE.url}/portfolio)\n${STUDIES.map(s => `- [Studie: ${s.title}](${SITE.url}/studie/${s.slug}): ${s.desc}`).join("\n")}\n\n## Blog\n${POSTS.map(p => `- [${p.title}](${SITE.url}/${p.slug}): ${p.desc}`).join("\n")}\n`);

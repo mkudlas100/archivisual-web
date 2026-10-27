@@ -6,7 +6,7 @@ export const SITE = {
   email: "kontakt@archivisual.cz",
   phones: [
     { tel: "+420724589403", label: "+420 724 589 403", who: "Matěj Kudlička" },
-    { tel: "+420608776171", label: "+420 608 776 171", who: "Michal" },
+    { tel: "+420608776171", label: "+420 608 776 171", who: "Michele Corradini" },
   ],
   address: { street: "Šaldova 544/6", zip: "186 00", city: "Praha 8 – Karlín", country: "CZ", lat: 50.0923679, lng: 14.4561536 },
   map: "https://www.google.com/maps/place/%C5%A0aldova+544%2F6,+186+00+Karl%C3%ADn",
@@ -90,8 +90,6 @@ const RAW = [
   ["c983c46f5881cbb10db2c130b032d6c3/Archivisual-22-.webp", "Rodinný dům", "", "", "ext", 0],
   ["4e05b7477f1aa6cdf6f7a02507e9a853/Archivisual-21-.webp", "Rodinný dům", "", "", "ext", 0],
   ["5b7abb55b1d826445552914fc0383f47/Archivisual-23-.webp", "Srub v lese", "", "", "ext", 0],
-  ["a7f1908ddabe13a454d726dc6b32a5aa/Archivisual-38-.webp", "Obývací pokoj", "", "", "int", 0],
-  ["5dc65c000c9281a7f2de08f369f00543/Archivisual-40-.webp", "Restaurace", "", "", "int", 0],
   ["cb6e54ac9151f10a1338042236f1ba46/Archivisual-37-.webp", "Kuchyň", "", "", "int", 0],
   ["272003ad25b091505871c11e0f588829/Archivisual-32-.webp", "Atrium", "", "", "int", 0],
   ["448476f6ddfe426df8aea49f19e25a92/Archivisual-31-.webp", "Obchodní pasáž", "", "", "int", 0],
@@ -134,4 +132,15 @@ export const CLIENTS = [
 export const TESTIMONIALS = [
   ["Archivisual je naším dlouholetým partnerem na tvorbu 3D vizualizací pro větší architektonické projekty i menší soutěže. Naše spolupráce je vždy profesionální a výsledky perfektně odpovídají našim představám.", "Ing. arch. Marek Veleba", "Oikoi Architekti, CEO"],
   ["Studio Archivisual pro nás realizuje interiérové vizualizace našich bytových projektů od konceptu po prezentace. Vizualizace velmi pomáhají klientovi si představit prostor a uvědomit si jeho potenciál.", "Lenka Hanžlová", "Jednatelka, Czechbuilding"],
+];
+
+// Orientační ceny bez DPH (návrh podle trhu, schválit s klientem).
+export const PRICES = [
+  ["Exteriér rodinného domu", "od 9 000 Kč", "první pohled; každý další pohled od 3 000 Kč"],
+  ["Bytový dům a developerský projekt", "od 15 000 Kč", "první pohled; každý další pohled od 5 000 Kč"],
+  ["Interiér", "od 6 000 Kč", "za pohled; celý byt podle počtu místností"],
+  ["Letecký záběr dronem a fotozákres", "od 8 000 Kč", "za pohled včetně leteckého snímku"],
+  ["Virtuální staging", "od 3 000 Kč", "za obrázek prázdné nebo zastaralé místnosti"],
+  ["Virtuální prohlídka 360°", "od 20 000 Kč", "podle počtu místností"],
+  ["Animace a video", "od 30 000 Kč", "krátké video exteriéru nebo průchod interiérem"],
 ];

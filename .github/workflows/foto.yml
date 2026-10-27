@@ -1,0 +1,24 @@
+name: Stažení fotek z původního webu
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["tools/foto.mjs", "src/data.mjs", ".github/workflows/foto.yml"]
+permissions:
+  contents: write
+jobs:
+  foto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node tools/foto.mjs
+      - name: Uložit do větve foto
+        run: |
+          cd foto
+          git init -q -b foto
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A && git commit -qm "Fotky z původního webu"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" foto

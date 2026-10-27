@@ -254,3 +254,13 @@ footer.site nav{display:flex;gap:22px;flex-wrap:wrap}
 .rv{transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .js .rv.wait{opacity:0;transform:translateY(24px)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.js .rv.wait{opacity:1;transform:none}}
+
+/* ceník */
+.prices{border-top:1px solid var(--line)}
+.pr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 32px;align-items:baseline;padding-block:20px;border-bottom:1px solid var(--line)}
+.pr h3{font-size:var(--s-l);font-weight:350}
+.pr p{font-size:var(--s-s);margin-top:4px}
+.pr b{font-size:var(--s-l);font-weight:400;font-variant-numeric:tabular-nums;white-space:nowrap}
+.prose .pr h3{margin:0}
+.prose .prices{margin:1.4em 0}
+@media (max-width:520px){.pr{grid-template-columns:1fr}}
