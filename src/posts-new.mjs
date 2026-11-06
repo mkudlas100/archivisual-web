@@ -9,12 +9,12 @@ desc: "Cena 3D vizualizace domu, bytu nebo developerského projektu závisí na 
 img: "/img/studie/kosicka-006.jpg",
 tags: ["Ceny", "Developeři"],
 faq: [
-  ["Kolik stojí jedna vizualizace?", "Exteriér rodinného domu začíná na 9 000 Kč za první pohled, další pohled ze stejné scény na 3 000 Kč. Interiér začíná na 6 000 Kč za pohled. Ceny jsou orientační a bez DPH; přesnou cenu pošleme po zaslání podkladů."],
-  ["Je levnější exteriér, nebo interiér?", "Záleží na rozsahu. Jednoduchý exteriér rodinného domu může být méně náročný než detailní interiér s mnoha materiály a vybavením. Velký obytný soubor s okolím je naopak náročnější než jeden pokoj."],
+  ["Kolik stojí jedna vizualizace?", "Exteriérový fotorealistický render stojí 14 000 Kč za záběr, interiérový záběr 12 000 Kč a zákres do letecké fotografie 12 000 Kč, vše bez DPH. Pokud je potřeba dopracovat scénu (zeleň, terén, okolí), účtujeme 1 300 Kč za hodinu. Přesnou cenu pošleme po zaslání podkladů."],
+  ["Je levnější exteriér, nebo interiér?", "Podle ceníku stojí interiérový záběr 12 000 Kč a exteriérový render 14 000 Kč (bez DPH). U velkých exteriérů s rozsáhlým okolím se může připočíst dopracování scény za 1 300 Kč za hodinu."],
   ["Co potřebujete, abyste mohli poslat cenu?", "Stačí výkresy nebo 3D model, představa o počtu a typu pohledů, k čemu budou vizualizace sloužit a termín."],
 ],
 body: `
-<p class="lead">Exteriér rodinného domu u nás začíná na 9 000 Kč za první pohled, bytový dům na 15 000 Kč a interiér na 6 000 Kč za pohled (bez DPH). Konečná cena záleží na kvalitě podkladů, počtu pohledů, úrovni detailu a na tom, k čemu budou obrázky sloužit.</p>
+<p class="lead">Exteriérový fotorealistický render u nás stojí 14 000 Kč za záběr, interiérový záběr 12 000 Kč a zákres do letecké fotografie 12 000 Kč (bez DPH). Konečná cena záleží hlavně na počtu záběrů, kvalitě podkladů a na tom, kolik je potřeba dopracovat okolí.</p>
 <h2>Orientační ceník</h2>
 {{CENIK}}
 <p>Níže najdete, co cenu nejvíc ovlivňuje a jak ji můžete snížit, aniž byste slevili z kvality. Aktuální ceny jsou vždy na stránce <a href="/cenik">Ceník</a>.</p>
@@ -22,7 +22,7 @@ body: `
 <h3>1. Podklady</h3>
 <p>Nejlevnější je začít z hotového 3D modelu, například z Archicadu nebo Revitu. Když máme jen 2D výkresy, musíme model nejdřív postavit. I hotový model často doplňujeme o detaily fasády, zábradlí, terén nebo okolí, aby obstál v detailním záběru.</p>
 <h3>2. Počet pohledů</h3>
-<p>Nejvíc práce zabere příprava scény: model, materiály, světlo a okolí. Každý další pohled ze stejné scény je proto výrazně levnější než první. Vyplatí se objednat celou sadu najednou.</p>
+<p>Nejvíc práce zabere příprava scény: model, materiály, světlo a okolí. Proto se vyplatí rozmyslet všechny pohledy předem a objednat je najednou: scénu připravujeme jen jednou a dodání je rychlejší.</p>
 <h3>3. Typ a velikost projektu</h3>
 <p>Rodinný dům, bytový dům, obytný soubor, hala nebo interiér jednoho bytu mají úplně jinou náročnost. U interiéru rozhoduje počet místností a míra vybavení, u exteriéru rozsah okolí, zeleň a stafáž.</p>
 <h3>4. Úroveň detailu a atmosféra</h3>
@@ -55,7 +55,7 @@ body: `
 <h3>Co nám pošlete</h3>
 <ul><li>3D model (Archicad, Revit, SketchUp, DWG, IFC, FBX) nebo výkresy: půdorysy, řezy, pohledy.</li><li>Materiály a barvy fasády, oken a střechy, u interiéru vzorkovník a nábytek.</li><li>Situaci a fotografie pozemku a okolí.</li><li>Reference: obrázky, které se vám líbí, i ty, které ne.</li><li>Termín a místo použití (web, tisk, billboard).</li></ul>
 <h2>2. Model</h2>
-<p>Dodaný model upravíme pro vizualizaci. Doplníme detaily, které jsou v záběru vidět, a domodelujeme terén a okolí. U rezidenčního projektu na okraji Prahy jsme takto doplňovali model z Archicadu. Celý postup popisuje <a href="/case-study-3d-vizualizace-residencni-projekt">případová studie</a>.</p>
+<p>Dodaný model upravíme pro vizualizaci. Doplníme detaily, které jsou v záběru vidět, a domodelujeme terén a okolí. U rezidenčního projektu na okraji Prahy jsme takto doplňovali model z Archicadu. Celý postup popisuje <a href="/pripadova-studie-rezidencni-projekt">případová studie</a>.</p>
 <h2>3. Kamery a nálada</h2>
 <p>Navrhneme několik variant záběrů. Spolu vybereme nejlepší úhly a kompozice a na moodboardu si ujasníme náladu: denní dobu, roční období, počasí a míru „života“ ve scéně.</p>
 <h2>4. Světlo, materiály a stafáž</h2>

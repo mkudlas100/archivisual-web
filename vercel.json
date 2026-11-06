@@ -4,18 +4,112 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/home", "destination": "/", "permanent": true },
-    { "source": "/index", "destination": "/", "permanent": true },
-    { "source": "/gallerie", "destination": "/portfolio", "permanent": true },
-    { "source": "/blog", "destination": "/blog-archivisual", "permanent": true }
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/gallerie",
+      "destination": "/portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog-archivisual",
+      "permanent": true
+    },
+    {
+      "source": "/5-dvod-pro-manazeri-a-developei-vyuzivaji-3d-vizualizace",
+      "destination": "/proc-developeri-investuji-do-3d-vizualizaci",
+      "permanent": true
+    },
+    {
+      "source": "/jak-zlepit-sve-podnikani",
+      "destination": "/jak-zlepsit-podnikani-diky-vizualizaci",
+      "permanent": true
+    },
+    {
+      "source": "/uspech-na-realitnim-trhu-v-roce-2024",
+      "destination": "/virtualni-staging",
+      "permanent": true
+    },
+    {
+      "source": "/case-study-3d-vizualizace-residencni-projekt",
+      "destination": "/pripadova-studie-rezidencni-projekt",
+      "permanent": true
+    },
+    {
+      "source": "/apartment-prague",
+      "destination": "/studie/vrsovice-interier",
+      "permanent": true
+    },
+    {
+      "source": "/kosicka",
+      "destination": "/studie/kosicka-courtyard",
+      "permanent": true
+    },
+    {
+      "source": "/exterior-renders",
+      "destination": "/portfolio#ext",
+      "permanent": true
+    },
+    {
+      "source": "/kalkulace",
+      "destination": "/cenik",
+      "permanent": true
+    },
+    {
+      "source": "/galerie-kalkulace",
+      "destination": "/cenik",
+      "permanent": true
+    },
+    {
+      "source": "/kontaktujte-se-s-nami",
+      "destination": "/kontakt",
+      "permanent": true
+    },
+    {
+      "source": "/projekt-klucov",
+      "destination": "/portfolio",
+      "permanent": true
+    }
   ],
   "headers": [
-    { "source": "/img/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
-    { "source": "/(.*)", "headers": [
-      { "key": "X-Content-Type-Options", "value": "nosniff" },
-      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-      { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-      { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
-    ] }
+    {
+      "source": "/img/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
   ]
 }

@@ -72,7 +72,7 @@ body: `
 <p>3D vizualizace je dnes standardem moderního designu a marketingu: zrychluje vývoj, šetří náklady a ukáže produkt přesně takový, jaký bude.</p>`
 },
 {
-slug: "case-study-3d-vizualizace-residencni-projekt",
+slug: "pripadova-studie-rezidencni-projekt",
 title: "Případová studie: 3D vizualizace rezidenčního projektu",
 desc: "Jak vznikly nadhledové a uliční vizualizace rezidenčního projektu na okraji Prahy: od modelu z Archicadu po postprodukci.",
 img: IMG + "c2f5dad8feae100ef630c137589d3b64/A-CAM-Front-Interactive-LightMix.jpg",
@@ -96,7 +96,7 @@ body: `
 <ul><li>Detailní fotorealistické nadhledové i uliční záběry, které ukazují architekturu i atraktivní lokalitu.</li><li>Vizualizace posloužily investorovi jako hlavní marketingový nástroj.</li><li>Díky dlouhodobé spolupráci proběhlo vše hladce a rychle.</li></ul>`
 },
 {
-slug: "uspech-na-realitnim-trhu-v-roce-2024",
+slug: "virtualni-staging",
 title: "Virtuální staging: jak urychlit a zhodnotit prodej nemovitosti",
 desc: "Klasický a virtuální staging nemovitostí, jejich vliv na rychlost a cenu prodeje a tipy, jak virtuální staging dělat dobře.",
 img: IMG + "d690cb9e40515ecbfad1bd025932521c/Konceptual-Hotel-Escalade.jpg",
@@ -117,7 +117,7 @@ body: `
 <ul><li>Začněte obývacím pokojem, kuchyní a hlavní ložnicí.</li><li>Volte neutrální barvy a moderní nábytek, který osloví nejvíc lidí.</li><li>Zvýrazněte jedinečné prvky: vysoké stropy, velká okna.</li><li>Držte jednotný styl napříč nabídkami.</li><li>Méně je více; přeplněný prostor kupující zahlcuje.</li></ul>`
 },
 {
-slug: "5-dvod-pro-manazeri-a-developei-vyuzivaji-3d-vizualizace",
+slug: "proc-developeri-investuji-do-3d-vizualizaci",
 title: "5 důvodů, proč manažeři a developeři investují do 3D vizualizací",
 desc: "Vyšší hodnota projektu, rychlejší schvalování, snazší návrh, marketing a předprodej: proč se developerům vyplatí 3D vizualizace.",
 img: IMG + "101b1cf5594c224e43b577b215f4dfc2/Lisabon-Dcam.jpg",
@@ -154,7 +154,7 @@ body: `
 <ul><li><b>Ukážete profesionalitu.</b> Kvalitní prezentace dává najevo, že na detailech záleží.</li><li><b>Vyniknete.</b> Odlišíte se od konkurence.</li><li><b>Zrychlíte rozhodování.</b> Kupující mají všechny informace pro rychlé a informované rozhodnutí.</li><li><b>Zvýšíte hodnotu.</b> Atraktivní prezentace přitáhne víc zájemců.</li></ul>`
 },
 {
-slug: "jak-zlepit-sve-podnikani",
+slug: "jak-zlepsit-podnikani-diky-vizualizaci",
 title: "Jak zlepšit své podnikání díky vizualizaci: 7 klíčových tipů",
 desc: "Jak vizualizace, videa a infografiky pomáhají v komunikaci s klienty, marketingu a prodeji. Praktické tipy pro firmy.",
 img: IMG + "a2150f5619dcd9b3f283dfd0bd2a771d/Think-Visual-Archivisual.jpg",

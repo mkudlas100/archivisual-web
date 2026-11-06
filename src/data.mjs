@@ -15,6 +15,8 @@ export const SITE = {
     ["Behance", "https://www.behance.net/archivisual_cz"],
     ["Pinterest", "https://cz.pinterest.com/matjkudlika/archivisual/"],
   ],
+  // Provozovatel pro patičku a zásady ochrany osobních údajů – doplnit podle rejstříku (čeká na klienta)
+  company: null, // např. { name: "…", ico: "…", seat: "…", register: "…" }
   team: [
     { name: "Matěj Kudlička", role: "3D artist", email: "kudlicka@archivisual.cz" },
     { name: "Michele Corradini", role: "Architekt", email: "corradini@archivisual.cz" },
@@ -106,25 +108,31 @@ const RAW = [
   ["c47a7e5d617506cdb2b4d1221097f37f/Archivisual-47-.webp", "Moderní haly", "", "", "air", 0],
 ];
 
-export const WORK = RAW.map((r, i) => ({
-  src: r[0], file: "w" + String(i + 1).padStart(3, "0") + "-" + r[0].split("/")[1].replace(/\.(png|webp)$/i, ".jpg").toLowerCase(),
-  t: r[1], k: r[2], y: r[3], c: r[4], home: !!r[5],
-}));
+// Jednotné názvy souborů: ROK_Klient_Projekt_TYP_NN_v01_WEB (bez diakritiky a mezer)
+const TYP = { ext: "EXT", int: "INT", air: "AER", prod: "PROD" };
+const camel = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, " ").trim().split(/\s+/).map(w => w[0].toUpperCase() + w.slice(1)).join("");
+const seq = {};
+export const WORK = RAW.map((r, i) => {
+  const key = [r[3], camel(r[2] || "Archivisual"), camel(r[1].split(",")[0]), TYP[r[4]]].filter(Boolean).join("_");
+  seq[key] = (seq[key] || 0) + 1;
+  return { src: r[0], file: `${key}_${String(seq[key]).padStart(2, "0")}_v01_WEB`, t: r[1], k: r[2], y: r[3], c: r[4], home: !!r[5] };
+});
 
 export const HERO = [1, 21, 4, 28, 26];
 
 export const SERVICES = [
-  ["Exteriérové vizualizace", "Budovy a krajina ve všech fázích projektu, od soutěžního návrhu po prodejní kampaň. Hlídáme každý detail i denní dobu, která stavbě nejvíc sluší."],
-  ["Interiérové vizualizace", "Realistické interiéry, ve kterých si klient představí, jak bude prostor žít. Materiály, světlo a vybavení podle návrhu architekta."],
-  ["Video prezentace a animace", "Průlety, průchody a krátká videa pro web a sociální sítě, která srozumitelně vysvětlí celý projekt."],
-  ["Letecké záběry a fotozákresy", "Pořídíme letecké snímky pozemku a stavbu do nich přesně zakreslíme. Víme, jaké záběry pro zákres potřebujete.", "/fotozakres-stavby"],
-  ["Virtuální prohlídky", "Z vizualizací vytvoříme 360° interaktivní prohlídku. Klient si prostory projde online z pohodlí domova.", "/virtualni-prohlidka-360"],
-  ["Produktové vizualizace", "Nábytek, svítidla i expozice v kvalitě pro katalogy, prezentace a e-shopy.", "/jak-3d-vizualizace-meni-svet"],
-  ["Architektonické soutěže a studie", "Vizualizace, které pomáhají vyhrávat soutěže a přesvědčit investora o hodnotě návrhu."],
+  ["Exteriérové vizualizace", "Budovy a krajina ve všech fázích projektu, od soutěžního návrhu po prodejní kampaň. Hlídáme každý detail i denní dobu, která stavbě nejvíc sluší.", [["/portfolio#ext", "Ukázky exteriérů"], ["/studie/kosicka-courtyard", "Studie Košická Courtyard"]]],
+  ["Interiérové vizualizace", "Realistické interiéry, ve kterých si klient představí, jak bude prostor žít. Materiály, světlo a vybavení podle návrhu architekta.", [["/portfolio#int", "Ukázky interiérů"], ["/studie/vrsovice-interier", "Studie bytu ve Vršovicích"]]],
+  ["Video prezentace a animace", "Průlety, průchody a krátká videa pro web a sociální sítě, která srozumitelně vysvětlí celý projekt.", []],
+  ["Letecké záběry a fotozákresy", "Pořídíme letecké snímky pozemku a stavbu do nich přesně zakreslíme. Víme, jaké záběry pro zákres potřebujete.", [["/portfolio#air", "Ukázky nadhledů"], ["/fotozakres-stavby", "Jak vzniká fotozákres"]]],
+  ["Virtuální prohlídky", "Z vizualizací vytvoříme 360° interaktivní prohlídku. Klient si prostory projde online z pohodlí domova.", [["/virtualni-prohlidka-360", "Jak vzniká prohlídka 360°"]]],
+  ["Virtuální staging", "Prázdný nebo zastaralý byt zařídíme ve vizualizaci, aby si kupující dokázal představit svůj budoucí domov.", [["/virtualni-staging", "Článek o virtuálním stagingu"]]],
+  ["Produktové vizualizace", "Nábytek, svítidla i expozice v kvalitě pro katalogy, prezentace a e-shopy.", [["/portfolio#prod", "Ukázky produktů"], ["/jak-3d-vizualizace-meni-svet", "Článek o produktových vizualizacích"]]],
+  ["Architektonické soutěže a studie", "Vizualizace, které pomáhají vyhrávat soutěže a přesvědčit investora o hodnotě návrhu.", []],
 ];
 
 export const CLIENTS = [
-  ["Czechbuilding", "https://www.czechbuildings.cz/"], ["Oikoi", "https://www.oikoi.eu/"], ["KRR Architektura", ""], ["VGP", ""],
+  ["Czechbuilding", "https://www.czechbuildings.cz/"], ["Oikoi", "https://www.oikoi.eu/"], ["KRR Architektura", ""], ["VGP", "https://www.vgpparks.eu/"],
   ["Prosun", "https://www.prosun.cz/"], ["Centrum výzkumu Řež", "https://www.cvrez.cz/"], ["ÚJV Řež", "https://www.ujv.cz/"],
   ["Anfilov", "http://anfilov.cz/"], ["Studio Rema 93", "https://www.studiorema93.cz/"], ["Bogle Architects", "https://www.boglearchitects.com/"],
 ];
@@ -134,13 +142,23 @@ export const TESTIMONIALS = [
   ["Studio Archivisual pro nás realizuje interiérové vizualizace našich bytových projektů od konceptu po prezentace. Vizualizace velmi pomáhají klientovi si představit prostor a uvědomit si jeho potenciál.", "Lenka Hanžlová", "Jednatelka, Czechbuilding"],
 ];
 
-// Orientační ceny bez DPH (návrh podle trhu, schválit s klientem).
+// Ceník podle kalkulace na archivisual.cz/kalkulace (stav 6. 11. 2026), ceny bez DPH.
+// [skupina, položka, cena v Kč (null = individuálně), jednotka]
 export const PRICES = [
-  ["Exteriér rodinného domu", "od 9 000 Kč", "první pohled; každý další pohled od 3 000 Kč"],
-  ["Bytový dům a developerský projekt", "od 15 000 Kč", "první pohled; každý další pohled od 5 000 Kč"],
-  ["Interiér", "od 6 000 Kč", "za pohled; celý byt podle počtu místností"],
-  ["Letecký záběr dronem a fotozákres", "od 8 000 Kč", "za pohled včetně leteckého snímku"],
-  ["Virtuální staging", "od 3 000 Kč", "za obrázek prázdné nebo zastaralé místnosti"],
-  ["Virtuální prohlídka 360°", "od 20 000 Kč", "podle počtu místností"],
-  ["Animace a video", "od 30 000 Kč", "krátké video exteriéru nebo průchod interiérem"],
+  ["Záběry", "Exteriérový fotorealistický render", 14000, "za záběr"],
+  ["Záběry", "Interiérový záběr", 12000, "za záběr"],
+  ["Záběry", "Zákres do letecké fotografie (3D model + dron)", 12000, "za záběr"],
+  ["Záběry", "Siteplan / ortofoto", 8000, "za záběr"],
+  ["Záběry", "360° panoramatický záběr", 16000, "za záběr"],
+  ["Animace", "Balíček 12s animace (video ze 3 záběrů)", 60000, "za balíček"],
+  ["Animace", "Animovaný průlet 15 s", 60000, "za video"],
+  ["Animace", "Oživení statického záběru pomocí AI", 6000, "za záběr"],
+  ["Animace", "Animace bez lidí", 2200, "za sekundu"],
+  ["Animace", "Animace s lidmi a stafáží", 4200, "za sekundu"],
+  ["Focení a letecké záběry", "Focení ulice, menší projekt (půlden)", 12000, ""],
+  ["Focení a letecké záběry", "Focení ulice, velký projekt (celý den)", 20000, ""],
+  ["Focení a letecké záběry", "Letecký balíček (foto + video)", 20000, ""],
+  ["Ostatní", "Dopracování scény (zeleň, terén, okolí)", 1300, "za hodinu"],
+  ["Ostatní", "Extra vysoké rozlišení (10 000+ px)", null, "příplatek individuálně"],
 ];
+export const kc = n => n == null ? "individuálně" : n.toLocaleString("cs-CZ").replace(/\s/g, "\u00A0") + "\u00A0Kč";

@@ -14,6 +14,7 @@ intro: [
 ],
 gallery: [
  ["kosicka-001.jpg", "Vnitřní dvůr, odpolední světlo, rodina u stolu", "wide"],
+ ["kosicka-002.jpg", "Rodinná večeře na terase mezi domy", ""],
  ["kosicka-000.jpg", "Cihlová věž, pohled na balkony", ""],
  ["kosicka-003.jpg", "Zahradní terasa, každodenní život", ""],
  ["kosicka-004.jpg", "Pergola s vistárií, letní posezení", ""],
@@ -47,6 +48,8 @@ intro: [
 ],
 gallery: [
  ["vrsovice-001.jpg", "Obývací pokoj: deštivé odpoledne, maminka s dítětem", "wide"],
+ ["vrsovice-000.jpg", "Obývací pokoj: děti a balonky", ""],
+ ["vrsovice-011.jpg", "Obývací pokoj: déšť za oknem", ""],
  ["vrsovice-002.jpg", "Obývací pokoj: oslava narozenin", "wide"],
  ["vrsovice-003.jpg", "Detail knihovny z dubu s bublinovým svítidlem", ""],
  ["vrsovice-004.jpg", "Detail okna a sedací soupravy", ""],
