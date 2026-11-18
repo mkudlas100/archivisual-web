@@ -7,7 +7,7 @@ function $(s,c){return (c||d).querySelector(s)}function $$(s,c){return Array.pro
 /* preloader (jen úvod, jednou za návštěvu) */
 var pre=$("#pre");
 if(pre){var seen=false;try{seen=sessionStorage.getItem("av-pre")==="1";sessionStorage.setItem("av-pre","1")}catch(e){}
-  if(reduce||seen){pre.remove()}else{var n=$("#preN"),t0=performance.now(),D=1100;(function tick(t){var k=Math.min(1,(t-t0)/D);n.textContent=String(Math.round(k*k*(3-2*k)*100)).padStart(3,"0");if(k<1)requestAnimationFrame(tick);else{pre.classList.add("done");setTimeout(function(){pre.remove()},1100)}})(t0)}}
+  if(reduce||seen){pre.remove()}else{var n=$("#preN"),t0=performance.now(),D=2300;(function tick(t){var k=Math.min(1,(t-t0)/D);n.textContent=String(Math.round(k*k*(3-2*k)*100)).padStart(3,"0");if(k<1)requestAnimationFrame(tick);else{pre.classList.add("done");setTimeout(function(){pre.remove()},1100)}})(t0)}}
 
 /* menu */
 var menu=$("#menu"),mb=$("#menuBtn");
