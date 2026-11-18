@@ -40,9 +40,9 @@ header.top{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-c
 header.top.solid{background:color-mix(in srgb,var(--paper) 90%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line)}
 body.over-dark header.top:not(.solid){color:#fff}
 .logo{display:block;text-decoration:none}
-.wm{display:block;height:clamp(18px,2vw,24px);width:auto}
-.logo .wm{margin-left:-0.4%}
-.menu .mtop .wm{height:20px}
+.wm{display:block;height:clamp(40px,4vw,52px);width:auto}
+.logo .wm{margin-left:-2px}
+.menu .mtop .wm{height:40px}
 picture{display:block}
 .stage picture,.study-cover picture{display:contents}
 .case .media picture,.post .ph picture,.art-hero picture{height:100%}
@@ -246,7 +246,7 @@ picture{display:block}
 .hp{position:absolute;left:-9999px}
 @media (max-width:760px){.ct-grid,.two{grid-template-columns:1fr}}
 footer.site{background:#17191B;color:#9EA1A3;font-size:var(--s-s);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,2fr);gap:24px 40px;align-items:start;padding-block:40px calc(32px + env(safe-area-inset-bottom,0px));border-top:1px solid #2C2E30}
-footer.site .logo{color:#ECECE8}footer.site .wm{height:18px}
+footer.site .logo{color:#ECECE8}footer.site .wm{height:56px}
 footer.site p{margin:0}.f-brand p{margin-top:10px}.f-legal{display:grid;gap:10px}
 footer.site a{text-decoration:none}footer.site a:hover{color:#ECECE8}
 footer.site nav{display:flex;gap:10px 22px;flex-wrap:wrap}

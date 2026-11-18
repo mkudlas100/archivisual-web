@@ -15,8 +15,8 @@ const HOME_BEST = WORK.map((w, i) => w.home ? i : -1).filter(i => i >= 0); // v�
 const POSTS = [...NEW_POSTS, ...OLD_POSTS];
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const WHITE = process.env.THEME === "white" || process.env.VERCEL_GIT_COMMIT_REF === "varianta-bila"; // srovnávací varianta s bílým pozadím
-const LOGO = (() => { const t = readFileSync("static/img/logo.svg", "utf8"); return { vb: t.match(/viewBox="([^"]+)"/)[1], d: t.match(/ d="([^"]+)"/)[1] }; })();
-const logoSvg = (cls = "") => `<svg class="wm ${cls}" viewBox="${LOGO.vb}" role="img" aria-label="Archivisual"><path fill="currentColor" d="${LOGO.d}"/></svg>`;
+const LOGO = (() => { const t = readFileSync("static/img/logo.svg", "utf8"); const c = t.match(/<circle[^>]*>/); return { vb: t.match(/viewBox="([^"]+)"/)[1], d: t.match(/ d="([^"]+)"/)[1], dot: c ? c[0].replace(/fill="[^"]*"/, 'fill="#C98A2E"') : "" }; })();
+const logoSvg = (cls = "") => `<svg class="wm ${cls}" viewBox="${LOGO.vb}" role="img" aria-label="Archivisual"><path fill="currentColor" d="${LOGO.d}"/>${LOGO.dot}</svg>`;
 
 let sharp = null;
 try { sharp = (await import("sharp")).default; } catch { console.warn("sharp není k dispozici – fotky se nezpracují"); }
@@ -392,8 +392,8 @@ await fs.copyFile("src/site.css", path.join(OUT, "assets/site.css"));
 await fs.copyFile("src/site.js", path.join(OUT, "assets/site.js"));
 if (sharp) { try {
   const shade = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></linearGradient></defs><rect width="1200" height="630" fill="url(#g)"/></svg>`);
-  const [, , vw, vh] = LOGO.vb.split(/\s+/).map(Number); const lw = 520, lh = Math.round(lw * vh / vw);
-  const logo = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${LOGO.vb}" width="${lw}" height="${lh}"><path fill="#fff" d="${LOGO.d}"/></svg>`);
+  const [, , vw, vh] = LOGO.vb.split(/\s+/).map(Number); const lw = 300, lh = Math.round(lw * vh / vw);
+  const logo = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${LOGO.vb}" width="${lw}" height="${lh}"><path fill="#fff" d="${LOGO.d}"/>${LOGO.dot}</svg>`);
   await write("img/og.jpg", await sharp(path.join(OUT, wBase(WORK[HERO[0]]) + "-2400.webp")).resize(1200, 630, { fit: "cover" }).composite([{ input: shade }, { input: logo, left: 56, top: 630 - lh - 50 }]).jpeg({ quality: 82 }).toBuffer());
 } catch (e) { console.warn("OG:", e.message); } }
 
