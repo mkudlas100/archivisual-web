@@ -2,7 +2,7 @@
 // Na Vercelu si skript stáhne fotky ze současného úložiště (becdn) a uloží je k webu.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { SITE, CDN, CATS, WORK, HERO, SERVICES, CLIENTS, TESTIMONIALS, PRICES, kc } from "./src/data.mjs";
+import { SITE, CATS, WORK, HERO, SERVICES, CLIENTS, TESTIMONIALS, PROJECT_PAGES } from "./src/data.mjs";
 import { readFileSync } from "node:fs";
 import { OLD_POSTS } from "./src/posts-old.mjs";
 import { NEW_POSTS } from "./src/posts-new.mjs";
@@ -11,7 +11,7 @@ import { STUDIES } from "./src/studies.mjs";
 const OUT = "dist";
 const NOINDEX = process.env.NOINDEX !== "0"; // do spuštění ostrého webu zakázat indexování
 const HOST = process.env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + process.env.VERCEL_PROJECT_PRODUCTION_URL : SITE.url;
-const HOME_BEST = [2, 4, 5, 6, 8, 13, 17, 22, 27, 29, 31, 34, 39, 40, 42, 44, 45, 56].map(n => n - 1); // výběr klienta (složka Foto/top 10), čísla AV
+const HOME_BEST = WORK.map((w, i) => w.home ? i : -1).filter(i => i >= 0); // výběr klienta (složka Foto/top 10)
 const POSTS = [...NEW_POSTS, ...OLD_POSTS];
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const WHITE = process.env.THEME === "white" || process.env.VERCEL_GIT_COMMIT_REF === "varianta-bila"; // srovnávací varianta s bílým pozadím
@@ -52,6 +52,8 @@ async function measure(file) {
 async function pool(items, n, fn) { const q = [...items]; await Promise.all(Array.from({ length: n }, async () => { while (q.length) await fn(q.shift()); })); }
 
 const wBase = w => `img/p/${w.file}`;
+const CDN_RE = /https:\/\/cloud-1de12d\.becdn\.net\/media\//;
+const pUrl = p => `/projekty/${p.slug}`;
 const thumb = w => `/${wBase(w)}.jpg`;
 const full = w => `/${wBase(w)}-2400.webp`;
 const sBase = f => `img/studie/${f.replace(/\.jpg$/, "")}`;
@@ -63,8 +65,9 @@ const pic = (base, alt, { sizes = "100vw", lazy = true, cls = "", extra = "" } =
 
 async function images() {
   await fs.cp("static", OUT, { recursive: true });
-  const jobs = WORK.map(w => [CDN + "iW=2400&iH=any/" + w.src, wBase(w)]);
-  for (const p of POSTS) if (!p.img.startsWith("/")) jobs.push([p.img.replace(CDN, CDN + "iW=2400&iH=any/"), blogBase(p)]);
+  await pool(WORK, 4, async w => { try { await fs.access(path.join(OUT, wBase(w) + ".jpg")); } catch { await variants(await fs.readFile(`photos/${w.f}.webp`), wBase(w)); } });
+  const jobs = [];
+  for (const p of POSTS) if (!p.img.startsWith("/")) jobs.push([p.img.replace(CDN_RE, m => m + "iW=2400&iH=any/"), blogBase(p)]);
   await pool(jobs, 6, ([u, b]) => fetchVariants(u, b));
   for (const w of WORK) await measure(wBase(w) + ".jpg");
   // fotky studií (originály ve static/img/studie)
@@ -88,7 +91,7 @@ const ld = (...nodes) => `<script type="application/ld+json">${JSON.stringify({ 
 const crumbsLd = items => ({ "@type": "BreadcrumbList", itemListElement: items.map(([n, u], i) => ({ "@type": "ListItem", position: i + 1, name: n, item: SITE.url + u })) });
 
 /* ---------- šablona ---------- */
-const NAV = [["/portfolio", "Práce"], ["/#studie", "Studie"], ["/#sluzby", "Služby"], ["/cenik", "Ceník"], ["/blog-archivisual", "Blog"]];
+const NAV = [["/portfolio", "Práce"], ["/projekty", "Projekty"], ["/#studie", "Studie"], ["/#sluzby", "Služby"], ["/blog-archivisual", "Blog"]];
 const CTA = "Poptat vizualizaci";
 async function page({ path: p, title, desc, body, schema = "", image = "/img/og.jpg", home = false, cur = "", dark = false }) {
   const canonical = SITE.url + (p === "/" ? "/" : p);
@@ -127,7 +130,7 @@ ${home ? '<div class="pre" id="pre" aria-hidden="true"><span>Archivisual – viz
     <a href="/studie/kosicka-courtyard">Košická Courtyard</a>
     <a href="/studie/vrsovice-interier">Byt ve Vršovicích</a>
     <a href="/#sluzby">Služby</a>
-    <a href="/cenik">Ceník</a>
+    <a href="/projekty">Projekty <small>${PROJECT_PAGES.length}</small></a>
     <a href="/blog-archivisual">Blog <small>${POSTS.length}</small></a>
     <a href="/kontakt">Kontakt</a>
   </nav>
@@ -140,12 +143,12 @@ ${contact()}
 <footer class="site wrap">
   <div class="f-brand"><a href="/" class="logo" aria-label="Archivisual – úvod">${logoSvg()}</a><p>3D vizualizace od roku ${SITE.since}</p></div>
   <div class="f-legal">${SITE.company ? `<p>${esc(SITE.company.name)}<br>IČO ${esc(SITE.company.ico)}<br>${esc(SITE.company.seat)}${SITE.company.register ? "<br>" + esc(SITE.company.register) : ""}</p>` : ""}<p>Ateliér: ${SITE.address.street}, ${SITE.address.zip} ${SITE.address.city}<br>${SITE.email}</p></div>
-  <nav aria-label="Patička"><a href="/portfolio">Práce</a><a href="/cenik">Ceník</a><a href="/blog-archivisual">Blog</a><a href="/kontakt">Kontakt</a><a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>${SITE.social.map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${n}</a>`).join("")}</nav>
+  <nav aria-label="Patička"><a href="/portfolio">Práce</a><a href="/projekty">Projekty</a><a href="/blog-archivisual">Blog</a><a href="/kontakt">Kontakt</a><a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>${SITE.social.map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${n}</a>`).join("")}</nav>
   <p class="f-copy">© ${new Date().getFullYear()} Archivisual</p>
 </footer>
 <div class="peek" id="peek" aria-hidden="true"></div>
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Detail vizualizace">
-  <div class="bar"><b id="lbT"></b><span id="lbN"></span><button id="lbX">Zavřít</button></div>
+  <div class="bar"><b id="lbT"></b><span id="lbN"></span><a id="lbP2" class="lb-proj" hidden>Celý projekt</a><button id="lbX">Zavřít</button></div>
   <figure id="lbFig"></figure>
   <div class="nav"><button id="lbP">Předchozí</button><span id="lbM"></span><button id="lbNx">Další</button></div>
 </div>
@@ -188,13 +191,13 @@ function contact() {
 }
 
 /* ---------- komponenty ---------- */
-const card = (w, i, extra) => `<figure class="card" tabindex="0" data-c="${w.c}" data-i="${i}"${extra ? ' data-extra="1"' : ""} data-full="${full(w)}" data-t="${esc(w.t)}" data-m="${esc([meta(w), CATS[w.c]].filter(Boolean).join(" — "))}">
+const card = (w, i, extra) => `<figure class="card" tabindex="0" data-c="${w.c}" data-i="${i}"${extra ? ' data-extra="1"' : ""}${w.p.slug ? ` data-p="${pUrl(w.p)}"` : ""} data-full="${full(w)}" data-t="${esc(w.t)}" data-m="${esc([meta(w), CATS[w.c]].filter(Boolean).join(" — "))}">
   <div class="ph">${pic(wBase(w), w.t + " – " + CATS[w.c].toLowerCase() + (w.k ? ", vizualizace pro " + w.k : ", 3D vizualizace") + (w.y ? ", " + w.y : ""), { sizes: WHITE ? "(max-width:700px) 100vw, 34vw" : "(max-width:700px) 100vw, (max-width:1100px) 50vw, 33vw" })}</div>
   <figcaption><b>${esc(w.t)}</b><span>${esc(meta(w) || CATS[w.c])}</span></figcaption>
 </figure>`;
-const row = (w, i, extra) => `<div class="row" role="button" tabindex="0" data-c="${w.c}"${extra ? ' data-extra="1"' : ""} data-full="${full(w)}" data-thumb="${thumb(w)}" data-t="${esc(w.t)}" data-m="${esc([meta(w), CATS[w.c]].filter(Boolean).join(" — "))}"><span class="n">AV/${String(i + 1).padStart(3, "0")}</span><span class="t">${esc(w.t)}</span><span class="k">${esc(w.k || "—")}</span><span class="muted">${CATS[w.c]}</span><span class="y">${w.y || ""}</span></div>`;
+const row = (w, i, extra) => `<div class="row" role="button" tabindex="0" data-c="${w.c}"${extra ? ' data-extra="1"' : ""}${w.p.slug ? ` data-p="${pUrl(w.p)}"` : ""} data-full="${full(w)}" data-thumb="${thumb(w)}" data-t="${esc(w.t)}" data-m="${esc([meta(w), CATS[w.c]].filter(Boolean).join(" — "))}"><span class="n">AV/${String(i + 1).padStart(3, "0")}</span><span class="t">${esc(w.t)}</span><span class="k">${esc(w.k || "—")}</span><span class="muted">${CATS[w.c]}</span><span class="y">${w.y || ""}</span></div>`;
 function gallery(items, { more = 0, list = true, heading = "h2", title = "Práce" } = {}) {
-  const counts = Object.keys(CATS).map(k => [k, items.filter(([w]) => w.c === k).length]);
+  const counts = Object.keys(CATS).map(k => [k, items.filter(([w]) => w.c === k).length]).filter(([, n]) => n);
   return `<div data-gallery>
   <div class="work-head"><${heading}>${title}</${heading}>
     <div class="ctrl">
@@ -204,16 +207,11 @@ function gallery(items, { more = 0, list = true, heading = "h2", title = "Práce
   </div>
   <div class="grid">${items.map(([w, i], k) => card(w, i, more && k >= more)).join("")}</div>
   ${list ? `<div class="list" hidden>${items.map(([w, i], k) => row(w, i, more && k >= more)).join("")}</div>` : ""}
-  ${more ? `<div class="more"><button class="btn" type="button">Zobrazit další projekty (${items.length - more})</button></div>` : ""}
+  ${more ? `<div class="more"><button class="btn" type="button">Zobrazit další vizualizace (${items.length - more})</button></div>` : ""}
 </div>`;
 }
+const projCard = (p, n = 0) => { const [w] = p.items.find(([x]) => x.home) || p.items[0]; return `<a class="pcard rv" href="${pUrl(p)}"><div class="ph">${pic(wBase(w), p.t + " – vizualizace", { sizes: "(max-width:700px) 100vw, (max-width:1100px) 50vw, 33vw" })}</div><div class="pc-t"><h3>${esc(p.t)}</h3><span>${esc([p.k, p.y].filter(Boolean).join(", "))}</span></div><p>${nb(esc(p.desc.split(". ")[0].replace(/\.$/, "")))}.</p><span class="pc-n">${p.items.length} vizualizací</span></a>`; };
 const postCard = p => `<a class="post" href="/${p.slug}"><div class="ph">${pic(blogBase(p), p.title, { sizes: "(max-width:700px) 100vw, 33vw" })}</div><span class="tg">${p.tags.join(" · ")}</span><h3>${nb(esc(p.title))}</h3><p>${nb(esc(p.desc))}</p></a>`;
-
-const priceTable = () => {
-  const groups = [...new Set(PRICES.map(p => p[0]))];
-  return groups.map(g => `<h3 class="pr-g">${g}</h3><div class="prices">${PRICES.filter(p => p[0] === g).map(([, n, c, u]) => `<div class="pr"><div><h4>${nb(n)}</h4>${u ? `<p class="muted">${u}</p>` : ""}</div><b>${kc(c)}</b></div>`).join("")}</div>`).join("") +
-    `<p class="muted" style="margin-top:16px;font-size:var(--s-s)">${nb("Ceny jsou bez DPH. Přesnou nabídku pošleme po zaslání podkladů; záleží na počtu záběrů, podkladech, dopracování okolí a termínu.")}</p>`;
-};
 
 /* ---------- stránky ---------- */
 const BEST_ORDER = [...HOME_BEST, ...WORK.map((_, i) => i).filter(i => !HOME_BEST.includes(i))];
@@ -234,6 +232,10 @@ async function home() {
 </section>
 <section class="wrap"><div class="intro rv"><h2>Co děláme</h2><p class="big">${nb("Spojujeme architekturu a grafiku. Pomáháme vyprávět příběh projektu světlem, kompozicí a pohledem člověka,")} <em>${nb("který v domě bude jednou žít.")}</em></p></div></section>
 <section class="wrap" id="prace" style="padding-top:0">${gallery(items, { more: HOME_BEST.length, list: false })}</section>
+<section class="wrap" id="projekty" style="padding-top:0">
+  <div class="work-head"><h2>Projekty</h2><a class="btn" href="/projekty">Všechny projekty (${PROJECT_PAGES.length})</a></div>
+  <div class="pcards">${PROJECT_PAGES.slice(0, 6).map(p => projCard(p)).join("")}</div>
+</section>
 <section class="wrap" id="studie" style="padding-top:0">
   <p class="sec-h">Případové studie</p>
   <a class="case rv" href="/studie/${k.slug}"><div class="media">${pic(sBase("kosicka-007.jpg"), "Vnitřní dvůr rezidence Košická ve zlaté hodině", { sizes: "(max-width:860px) 100vw, 60vw" })}</div><div><p class="kick">${k.kicker}</p><h3>${k.title}</h3><p>${nb(k.lead)} ${nb("Osm vizualizací se scénami ze života obyvatel.")}</p><span class="btn">Prohlédnout studii</span></div></a>
@@ -242,7 +244,6 @@ async function home() {
 <section class="wrap" id="sluzby" style="padding-top:0">
   <div class="two-col rv" style="margin-bottom:clamp(32px,5vw,64px)"><h2>Služby</h2><p class="big" style="font-size:var(--s-l);max-width:40ch">${nb("Od první skici po prodejní kampaň. Každou zakázku stavíme na míru, ať jde o jeden pokoj, nebo celý obytný soubor.")}</p></div>
   <div class="svc">${SERVICES.map((s, i) => `<details${i ? "" : " open"}><summary><h3>${s[0]}</h3><i aria-hidden="true">+</i></summary><div class="body"><span></span><div><p>${nb(s[1])}</p>${s[2].length ? `<p class="svc-links">${s[2].map(([u, l]) => `<a href="${u}">${l}</a>`).join("")}</p>` : ""}</div></div></details>`).join("")}</div>
-  <p style="margin-top:28px"><a class="btn" href="/cenik">Orientační ceník</a></p>
   <div class="dev">
     <div><h3>Developerský servis</h3><p class="muted">${nb("Kromě vizualizací pomáháme s prodejem malých i velkých projektů.")}</p></div>
     <div><h3>Web a SEO</h3><p>${nb("Přehledná prezentace nemovitosti a bytových jednotek. Postaráme se, aby byl web vidět.")}</p></div>
@@ -273,7 +274,7 @@ async function portfolio() {
   const body = `<section class="wrap" style="padding-top:calc(130px + env(safe-area-inset-top,0px))">
   <nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>Práce</span></nav>
   ${gallery(items, { heading: "h1", title: "Práce" })}
-  <p class="muted" style="margin-top:24px">${nb("Exteriérové a interiérové 3D vizualizace, letecké nadhledy a produktové vizualizace z let 2020–2025. Celé sady obrázků z vybraných projektů najdete v")} <a href="/#studie">případových studiích</a>.</p>
+  <p class="muted" style="margin-top:24px">${nb("Exteriérové a interiérové 3D vizualizace, letecké nadhledy, průmyslové areály a produktové vizualizace z let " + Math.min(...WORK.map(w => w.y).filter(Boolean)) + "–" + Math.max(...WORK.map(w => w.y).filter(Boolean)) + ". Celé sady obrázků najdete na stránkách")} <a href="/projekty">projektů</a> ${nb("a v")} <a href="/#studie">případových studiích</a>.</p>
 </section>`;
   return page({ path: "/portfolio", cur: "/portfolio", title: "Galerie 3D vizualizací | Archivisual", desc: `Galerie ${WORK.length} architektonických 3D vizualizací: exteriéry, interiéry, letecké nadhledy a produkty. Studio Archivisual, Praha.`, body, schema: ld(crumbsLd([["Úvod", "/"], ["Práce", "/portfolio"]])) });
 }
@@ -316,7 +317,7 @@ async function post(p) {
 <div class="wrap"><div class="art-hero">${pic(blogBase(p), p.title, { lazy: false })}</div></div>
 <article class="art wrap">
   <p class="meta">Matěj Kudlička, 3D artist${date ? " · " + date : ""} · ${p.tags.join(", ")}</p>
-  <div class="prose">${nb(p.body).replace("{{CENIK}}", priceTable())}</div>
+  <div class="prose">${nb(p.body).replace("{{CENIK}}", "")}</div>
   ${p.faq ? `<div class="faq"><h2 class="sec-h" style="margin:24px 0 8px">Časté otázky</h2>${p.faq.map(([q, a]) => `<details><summary>${nb(q)}</summary><p>${nb(a)}</p></details>`).join("")}</div>` : ""}
   <div class="author"><div><b>Matěj Kudlička</b><br><span class="muted">3D artist, Archivisual. Studio tvoří vizualizace od roku ${SITE.since}.</span></div></div>
   <div class="cta-box"><h2>Chystáte projekt?</h2><p>${nb("Pošlete nám výkresy nebo model a připravíme nabídku na míru.")}</p><a class="btn solid" href="#kontakt" style="justify-self:start">${CTA}</a></div>
@@ -328,15 +329,29 @@ async function post(p) {
   return page({ path: url, cur: "/blog-archivisual", title: `${p.title} | Archivisual`, desc: p.desc, body, image: blogImg(p), schema: ld(...nodes) });
 }
 
-async function cenik() {
+async function projectsIndex() {
   const body = `<section class="wrap" style="padding-top:calc(130px + env(safe-area-inset-top,0px))">
-  <nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>Ceník</span></nav>
-  <div class="two-col"><h1 class="big">Ceník 3D vizualizací</h1><div><p style="font-size:var(--s-l);font-weight:300">${nb("Ceny za záběr, animace a focení. Každá zakázka je jiná, proto vám po zaslání podkladů pošleme přesnou nabídku.")}</p></div></div>
-  <div style="margin-top:clamp(32px,5vw,64px)">${priceTable()}</div>
-  <div class="cta-box" style="max-width:42rem"><h2>Co cenu ovlivňuje</h2><p>${nb("Kvalita podkladů, počet pohledů, úroveň detailu, letecké záběry, počet kol připomínek a termín.")} <a href="/kolik-stoji-3d-vizualizace">Podrobně v článku</a>.</p><a class="btn solid" href="#kontakt" style="justify-self:start">${CTA}</a></div>
+  <nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>Projekty</span></nav>
+  <div class="work-head"><h1>Projekty</h1><p class="muted" style="max-width:44ch">${nb("Vybrané zakázky s celou sadou vizualizací a popisem atmosféry, kterou jsme chtěli zachytit.")}</p></div>
+  <div class="pcards">${PROJECT_PAGES.map(p => projCard(p)).join("")}</div>
 </section>`;
-  return page({ path: "/cenik", cur: "/cenik", title: "Ceník 3D vizualizací | Archivisual", desc: "Ceník 3D vizualizací: exteriérový render 14 000 Kč, interiérový záběr 12 000 Kč, zákres do letecké fotografie 12 000 Kč, 360° záběr, animace a focení. Ceny bez DPH, studio Archivisual, Praha.", body,
-    schema: ld(crumbsLd([["Úvod", "/"], ["Ceník", "/cenik"]]), { "@type": "OfferCatalog", name: "Ceník 3D vizualizací", itemListElement: PRICES.filter(p => p[2] != null).map(([g, n, c, u]) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name: n, category: g }, price: c, priceCurrency: "CZK", description: u || undefined, priceSpecification: { "@type": "UnitPriceSpecification", price: c, priceCurrency: "CZK", valueAddedTaxIncluded: false } })) }) });
+  return page({ path: "/projekty", cur: "/projekty", title: "Projekty – 3D vizualizace | Archivisual", desc: `${PROJECT_PAGES.length} projektů architektonických 3D vizualizací: bytové domy, rodinné domy, interiéry, průmyslové areály a produkty. Studio Archivisual, Praha.`, body, schema: ld(crumbsLd([["Úvod", "/"], ["Projekty", "/projekty"]])) });
+}
+
+async function project(p, idx) {
+  const url = pUrl(p), [cw] = p.items.find(([x]) => x.home) || p.items[0];
+  const cats = [...new Set(p.items.map(([w]) => CATS[w.c]))].join(", ");
+  const fig = ([w], wide) => `<figure class="${wide ? "wide" : ""}" data-full="${full(w)}" data-t="${esc(p.t)}" data-m="${esc([p.k, p.y, CATS[w.c]].filter(Boolean).join(" — "))}">${pic(wBase(w), p.t + " – " + CATS[w.c].toLowerCase() + (p.k ? ", vizualizace pro " + p.k : ""), { sizes: wide ? "100vw" : "(max-width:700px) 100vw, 33vw" })}</figure>`;
+  const rest = p.items.filter(it => it[0] !== cw);
+  const others = [1, 2, 3].map(k => PROJECT_PAGES[(idx + k) % PROJECT_PAGES.length]);
+  const body = `
+<section class="study-cover">${pic(wBase(cw), p.t + " – úvodní vizualizace", { lazy: false, sizes: "100vw" })}<div class="in wrap"><p class="kick">${esc([p.k, p.y].filter(Boolean).join(" · ")) || "Archivisual"}</p><h1>${esc(p.t)}</h1></div></section>
+<div class="wrap"><div class="sfacts">${[[p.items.length, "vizualizací"], [p.y, "rok"], [p.k, "klient"], [cats, "typ záběrů", 1]].filter(f => f[0]).map(([a, b, sm]) => `<div><b${sm ? ' class="sm"' : ""}>${esc(a)}</b><span>${b}</span></div>`).join("")}</div></div>
+<section class="wrap"><div class="two-col"><h2>Atmosféra</h2><div><p class="big">${nb(esc(p.desc))}</p>${p.id === "2026_LivingSolutions_Kosicka" ? `<p style="margin-top:24px"><a class="btn" href="/studie/kosicka-courtyard">Případová studie Košická Courtyard</a></p>` : ""}</div></div></section>
+<section class="wrap" style="padding-top:0"><div class="sgal">${rest.length > 1 ? `<div class="scol">${rest.map(it => fig(it)).join("")}</div>` : rest.map(it => fig(it, true)).join("")}</div></section>
+<section class="wrap related" style="padding-block:clamp(56px,8vw,100px)"><div class="work-head"><h2 style="font-size:var(--s-xl)">Další projekty</h2><a class="btn" href="/projekty">Všechny projekty</a></div><div class="pcards">${others.map(o => projCard(o)).join("")}</div></section>`;
+  return page({ path: url, cur: "/projekty", dark: true, title: `${p.t}${p.k ? " – " + p.k : ""} | 3D vizualizace Archivisual`, desc: `${p.t}${p.k ? " (" + p.k + (p.y ? ", " + p.y : "") + ")" : p.y ? " (" + p.y + ")" : ""}: ${p.items.length} vizualizací. ${p.desc}`.slice(0, 300), body, image: "/" + wBase(cw) + ".jpg",
+    schema: ld(crumbsLd([["Úvod", "/"], ["Projekty", "/projekty"], [p.t, url]]), { "@type": "CreativeWork", name: p.t, description: p.desc, ...(p.y ? { dateCreated: String(p.y) } : {}), creator: { "@id": SITE.url + "/#studio" }, ...(p.k ? { sourceOrganization: { "@type": "Organization", name: p.k } } : {}), image: p.items.map(([w]) => SITE.url + "/" + wBase(w) + ".jpg") }) });
 }
 
 async function kontakt() {
@@ -385,16 +400,17 @@ if (sharp) { try {
 await write("index.html", await home());
 await write("portfolio.html", await portfolio());
 for (const s of STUDIES) await write(`studie/${s.slug}.html`, await study(s));
-await write("cenik.html", await cenik());
 await write("blog-archivisual.html", await blogIndex());
 for (const p of POSTS) await write(`${p.slug}.html`, await post(p));
+await write("projekty.html", await projectsIndex());
+for (const [i, p] of PROJECT_PAGES.entries()) await write(`projekty/${p.slug}.html`, await project(p, i));
 await write("kontakt.html", await kontakt());
 await write("ochrana-osobnich-udaju.html", await privacy());
 await write("dekujeme.html", await simple("/dekujeme", "Děkujeme", "Děkujeme, poptávka je odeslaná", "Ozveme se vám s cenou a termínem. Pokud spěcháte, zavolejte nám."));
 await write("404.html", await simple("/404", "Stránka nenalezena", "Tuhle stránku jsme nenašli", "Možná se přesunula. Zkuste galerii, blog, nebo nám napište."));
 
-const urls = ["/", "/portfolio", "/cenik", "/kontakt", "/ochrana-osobnich-udaju", ...STUDIES.map(s => "/studie/" + s.slug), "/blog-archivisual", ...POSTS.map(p => "/" + p.slug)];
+const urls = ["/", "/portfolio", "/projekty", ...PROJECT_PAGES.map(pUrl), "/kontakt", "/ochrana-osobnich-udaju", ...STUDIES.map(s => "/studie/" + s.slug), "/blog-archivisual", ...POSTS.map(p => "/" + p.slug)];
 await write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE.url}${u}</loc><lastmod>${BUILD_DATE}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 await write("robots.txt", NOINDEX ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
 await write("llms.txt", `# Archivisual\n\n> Pražské studio architektonických 3D vizualizací (od roku ${SITE.since}), Šaldova 544/6, Praha 8 – Karlín. Exteriérové a interiérové vizualizace, animace, letecké záběry a fotozákresy, virtuální prohlídky 360°, produktové vizualizace a developerský servis.\n\n- Kontakt: ${SITE.email}, ${SITE.phones.map(p => p.label + " (" + p.who + ")").join(", ")}\n- [Galerie](${SITE.url}/portfolio)\n${STUDIES.map(s => `- [Studie: ${s.title}](${SITE.url}/studie/${s.slug}): ${s.desc}`).join("\n")}\n\n## Blog\n${POSTS.map(p => `- [${p.title}](${SITE.url}/${p.slug}): ${p.desc}`).join("\n")}\n`);
-console.log(`Hotovo: ${urls.length} stránek, ${WORK.length} projektů, ${POSTS.length} článků.`);
+console.log(`Hotovo: ${urls.length} stránek, ${WORK.length} vizualizací, ${PROJECT_PAGES.length} projektů, ${POSTS.length} článků.`);

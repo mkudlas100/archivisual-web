@@ -16,8 +16,7 @@ faq: [
 body: `
 <p class="lead">Exteriérový fotorealistický render u nás stojí 14 000 Kč za záběr, interiérový záběr 12 000 Kč a zákres do letecké fotografie 12 000 Kč (bez DPH). Konečná cena záleží hlavně na počtu záběrů, kvalitě podkladů a na tom, kolik je potřeba dopracovat okolí.</p>
 <h2>Orientační ceník</h2>
-{{CENIK}}
-<p>Níže najdete, co cenu nejvíc ovlivňuje a jak ji můžete snížit, aniž byste slevili z kvality. Aktuální ceny jsou vždy na stránce <a href="/cenik">Ceník</a>.</p>
+<p>Níže najdete, co cenu nejvíc ovlivňuje a jak ji můžete snížit, aniž byste slevili z kvality.</p>
 <h2>Co ovlivňuje cenu vizualizace</h2>
 <h3>1. Podklady</h3>
 <p>Nejlevnější je začít z hotového 3D modelu, například z Archicadu nebo Revitu. Když máme jen 2D výkresy, musíme model nejdřív postavit. I hotový model často doplňujeme o detaily fasády, zábradlí, terén nebo okolí, aby obstál v detailním záběru.</p>
