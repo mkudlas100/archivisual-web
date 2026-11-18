@@ -2,7 +2,7 @@
 // Na Vercelu si skript stáhne fotky ze současného úložiště (becdn) a uloží je k webu.
 import fs from "node:fs/promises";
 import path from "node:path";
-import { SITE, CATS, WORK, HERO, SERVICES, CLIENTS, TESTIMONIALS, PROJECT_PAGES } from "./src/data.mjs";
+import { SITE, CATS, WORK, MAIN, HOME_N, EXTRA, HERO, SERVICES, CLIENTS, TESTIMONIALS, PROJECT_PAGES } from "./src/data.mjs";
 import { readFileSync } from "node:fs";
 import { OLD_POSTS } from "./src/posts-old.mjs";
 import { NEW_POSTS } from "./src/posts-new.mjs";
@@ -11,12 +11,14 @@ import { STUDIES } from "./src/studies.mjs";
 const OUT = "dist";
 const NOINDEX = process.env.NOINDEX !== "0"; // do spuštění ostrého webu zakázat indexování
 const HOST = process.env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + process.env.VERCEL_PROJECT_PRODUCTION_URL : SITE.url;
-const HOME_BEST = WORK.map((w, i) => w.home ? i : -1).filter(i => i >= 0); // výběr klienta (složka Foto/top 10)
+
 const POSTS = [...NEW_POSTS, ...OLD_POSTS];
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const WHITE = process.env.THEME === "white" || process.env.VERCEL_GIT_COMMIT_REF === "varianta-bila"; // srovnávací varianta s bílým pozadím
-const LOGO = (() => { const t = readFileSync("static/img/logo.svg", "utf8"); const c = t.match(/<circle[^>]*>/); return { vb: t.match(/viewBox="([^"]+)"/)[1], d: t.match(/ d="([^"]+)"/)[1], dot: c ? c[0].replace(/fill="[^"]*"/, 'fill="#C98A2E"') : "" }; })();
-const logoSvg = (cls = "") => `<svg class="wm ${cls}" viewBox="${LOGO.vb}" role="img" aria-label="Archivisual"><path fill="currentColor" d="${LOGO.d}"/>${LOGO.dot}</svg>`;
+const LOGO = (() => { const t = readFileSync("static/img/logo.svg", "utf8"); const P = [...t.matchAll(/<path data-g="(\w)" d="([^"]+)"\/>/g)]; const c = t.match(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/);
+  return { vb: t.match(/viewBox="([^"]+)"/)[1], d: P.map(m => m[2]).join(""), parts: P, dot: c ? { cx: c[1], cy: c[2], r: c[3] } : null }; })();
+let ci = 0;
+const logoSvg = (cls = "") => { ci = 0; return `<svg class="wm ${cls}" viewBox="${LOGO.vb}" role="img" aria-label="Archivisual">${LOGO.parts.map(([, g, d]) => `<path class="${g}${g === "c" ? " c" + (++ci) : ""}" fill="currentColor" d="${d}"/>`).join("")}${LOGO.dot ? `<circle class="dot" cx="${LOGO.dot.cx}" cy="${LOGO.dot.cy}" r="${LOGO.dot.r}" fill="#C98A2E"/>` : ""}</svg>`; };
 
 let sharp = null;
 try { sharp = (await import("sharp")).default; } catch { console.warn("sharp není k dispozici – fotky se nezpracují"); }
@@ -40,7 +42,7 @@ async function variants(buf, base) {
 async function fetchVariants(url, base) {
   try { await fs.access(path.join(OUT, base + ".jpg")); return; } catch {}
   try {
-    const r = await fetch(url, { headers: { "user-agent": "Mozilla/5.0 archivisual-build" } });
+    const r = await fetch(url, { headers: { "user-agent": "Mozilla/5.0 archivisual-build" }, signal: AbortSignal.timeout(30000) });
     if (!r.ok) throw new Error(r.status);
     await variants(Buffer.from(await r.arrayBuffer()), base);
   } catch (e) { console.warn("Nestaženo:", url, e.message); }
@@ -112,10 +114,10 @@ ${schema}
 </head>
 <body${dark ? ' class="over-dark"' : ""}>
 <a class="skip" href="#obsah">Přeskočit na obsah</a>
-${home ? '<div class="pre" id="pre" aria-hidden="true"><span>Archivisual – vizualizace od roku ' + SITE.since + '</span><b id="preN">000</b></div>' : ""}
+${home ? '<div class="pre" id="pre" aria-hidden="true">' + logoSvg("pre-logo anim") + '<span>Vizualizace od roku ' + SITE.since + '</span><b id="preN">000</b></div>' : ""}
 <div class="cur" id="cur" aria-hidden="true"><em>Zobrazit</em></div>
 <header class="top wrap" id="top">
-  <a class="logo" href="/" aria-label="Archivisual – úvod">${logoSvg()}</a>
+  <a class="logo" href="/" aria-label="Archivisual – úvod">${logoSvg("anim")}</a>
   <nav class="hnav" aria-label="Hlavní">
     ${NAV.map(([u, l]) => `<a class="hl" href="${u}"${cur === u ? ' aria-current="page"' : ""}>${l}</a>`).join("")}
     <a class="hl" href="#kontakt">${CTA}</a>
@@ -126,7 +128,7 @@ ${home ? '<div class="pre" id="pre" aria-hidden="true"><span>Archivisual – viz
   <div class="mtop">${logoSvg()}<button class="btn-menu" id="menuClose">Zavřít</button></div>
   <nav>
     <a href="/">Úvod</a>
-    <a href="/portfolio">Práce <small>${WORK.length}</small></a>
+    <a href="/portfolio">Práce <small>${MAIN.length}</small></a>
     <a href="/studie/kosicka-courtyard">Košická Courtyard</a>
     <a href="/studie/vrsovice-interier">Byt ve Vršovicích</a>
     <a href="/#sluzby">Služby</a>
@@ -192,7 +194,7 @@ function contact() {
 
 /* ---------- komponenty ---------- */
 const card = (w, i, extra) => `<figure class="card" tabindex="0" data-c="${w.c}" data-i="${i}"${extra ? ' data-extra="1"' : ""}${w.p.slug ? ` data-p="${pUrl(w.p)}"` : ""} data-full="${full(w)}" data-t="${esc(w.t)}" data-m="${esc([meta(w), CATS[w.c]].filter(Boolean).join(" — "))}">
-  <div class="ph">${pic(wBase(w), w.t + " – " + CATS[w.c].toLowerCase() + (w.k ? ", vizualizace pro " + w.k : ", 3D vizualizace") + (w.y ? ", " + w.y : ""), { sizes: WHITE ? "(max-width:700px) 100vw, 34vw" : "(max-width:700px) 100vw, (max-width:1100px) 50vw, 33vw" })}</div>
+  <div class="ph">${w.p.slug ? `<div class="acts"><button type="button" class="a-prev">Náhled</button><a href="${pUrl(w.p)}">Celý projekt</a></div>` : ""}${pic(wBase(w), w.t + " – " + CATS[w.c].toLowerCase() + (w.k ? ", vizualizace pro " + w.k : ", 3D vizualizace") + (w.y ? ", " + w.y : ""), { sizes: WHITE ? "(max-width:700px) 100vw, 34vw" : "(max-width:700px) 100vw, (max-width:1100px) 50vw, 33vw" })}</div>
   <figcaption><b>${esc(w.t)}</b><span>${esc(meta(w) || CATS[w.c])}</span></figcaption>
 </figure>`;
 const row = (w, i, extra) => `<div class="row" role="button" tabindex="0" data-c="${w.c}"${extra ? ' data-extra="1"' : ""}${w.p.slug ? ` data-p="${pUrl(w.p)}"` : ""} data-full="${full(w)}" data-thumb="${thumb(w)}" data-t="${esc(w.t)}" data-m="${esc([meta(w), CATS[w.c]].filter(Boolean).join(" — "))}"><span class="n">AV/${String(i + 1).padStart(3, "0")}</span><span class="t">${esc(w.t)}</span><span class="k">${esc(w.k || "—")}</span><span class="muted">${CATS[w.c]}</span><span class="y">${w.y || ""}</span></div>`;
@@ -214,10 +216,8 @@ const projCard = (p, n = 0) => { const [w] = p.items.find(([x]) => x.home) || p.
 const postCard = p => `<a class="post" href="/${p.slug}"><div class="ph">${pic(blogBase(p), p.title, { sizes: "(max-width:700px) 100vw, 33vw" })}</div><span class="tg">${p.tags.join(" · ")}</span><h3>${nb(esc(p.title))}</h3><p>${nb(esc(p.desc))}</p></a>`;
 
 /* ---------- stránky ---------- */
-const BEST_ORDER = [...HOME_BEST, ...WORK.map((_, i) => i).filter(i => !HOME_BEST.includes(i))];
 async function home() {
-  const order = BEST_ORDER;
-  const items = order.map(i => [WORK[i], i]);
+  const items = MAIN.map(i => [WORK[i], i]);
   const k = STUDIES[0], v = STUDIES[1];
   const body = `
 <section class="hero wrap">
@@ -231,7 +231,7 @@ async function home() {
   <div class="stage-cap"><span id="stageCap">${esc(WORK[HERO[0]].t + " — " + meta(WORK[HERO[0]]))}</span><span class="dots" id="stageDots">${HERO.map((_, n) => `<button type="button" aria-label="Snímek ${n + 1}"${n ? "" : ' class="on"'}></button>`).join("")}</span></div>
 </section>
 <section class="wrap"><div class="intro rv"><h2>Co děláme</h2><p class="big">${nb("Spojujeme architekturu a grafiku. Pomáháme vyprávět příběh projektu světlem, kompozicí a pohledem člověka,")} <em>${nb("který v domě bude jednou žít.")}</em></p></div></section>
-<section class="wrap" id="prace" style="padding-top:0">${gallery(items, { more: HOME_BEST.length, list: false })}</section>
+<section class="wrap" id="prace" style="padding-top:0">${gallery(items, { more: HOME_N, list: false })}</section>
 <section class="wrap" id="projekty" style="padding-top:0">
   <div class="work-head"><h2>Projekty</h2><a class="btn" href="/projekty">Všechny projekty (${PROJECT_PAGES.length})</a></div>
   <div class="pcards">${PROJECT_PAGES.slice(0, 6).map(p => projCard(p)).join("")}</div>
@@ -243,7 +243,7 @@ async function home() {
 </section>
 <section class="wrap" id="sluzby" style="padding-top:0">
   <div class="two-col rv" style="margin-bottom:clamp(32px,5vw,64px)"><h2>Služby</h2><p class="big" style="font-size:var(--s-l);max-width:40ch">${nb("Od první skici po prodejní kampaň. Každou zakázku stavíme na míru, ať jde o jeden pokoj, nebo celý obytný soubor.")}</p></div>
-  <div class="svc">${SERVICES.map((s, i) => `<details${i ? "" : " open"}><summary><h3>${s[0]}</h3><i aria-hidden="true">+</i></summary><div class="body"><span></span><div><p>${nb(s[1])}</p>${s[2].length ? `<p class="svc-links">${s[2].map(([u, l]) => `<a href="${u}">${l}</a>`).join("")}</p>` : ""}</div></div></details>`).join("")}</div>
+  <div class="svc">${SERVICES.map((s, i) => `<details${i ? "" : " open"}><summary><h3>${s[0]}</h3><i aria-hidden="true">+</i></summary><div class="body"><span></span><div><p>${nb(s[1])}</p>${s[2].length ? `<p class="svc-links">${s[2].map(([u, l]) => `<a href="${u}">${l}</a>`).join("")}</p>` : ""}${EXTRA[i] ? `<div class="sgal svc-gal" id="${EXTRA[i].id}">${EXTRA[i].items.map(n => { const w = WORK[n]; return `<figure data-full="${full(w)}" data-t="${esc(w.t)}" data-m="${esc([w.k, w.y, CATS[w.c]].filter(Boolean).join(" — "))}"${w.p.slug ? ` data-p="${pUrl(w.p)}"` : ""}>${pic(wBase(w), w.t + " – " + CATS[w.c].toLowerCase() + (w.k ? ", " + w.k : ""), { sizes: "(max-width:760px) 50vw, 20vw" })}<figcaption>${esc(w.t)}</figcaption></figure>`; }).join("")}</div>` : ""}</div></div></details>`).join("")}</div>
   <div class="dev">
     <div><h3>Developerský servis</h3><p class="muted">${nb("Kromě vizualizací pomáháme s prodejem malých i velkých projektů.")}</p></div>
     <div><h3>Web a SEO</h3><p>${nb("Přehledná prezentace nemovitosti a bytových jednotek. Postaráme se, aby byl web vidět.")}</p></div>
@@ -270,13 +270,13 @@ async function home() {
 }
 
 async function portfolio() {
-  const items = BEST_ORDER.map(i => [WORK[i], i]);
+  const items = MAIN.map(i => [WORK[i], i]);
   const body = `<section class="wrap" style="padding-top:calc(130px + env(safe-area-inset-top,0px))">
   <nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>Práce</span></nav>
   ${gallery(items, { heading: "h1", title: "Práce" })}
-  <p class="muted" style="margin-top:24px">${nb("Exteriérové a interiérové 3D vizualizace, letecké nadhledy, průmyslové areály a produktové vizualizace z let " + Math.min(...WORK.map(w => w.y).filter(Boolean)) + "–" + Math.max(...WORK.map(w => w.y).filter(Boolean)) + ". Celé sady obrázků najdete na stránkách")} <a href="/projekty">projektů</a> ${nb("a v")} <a href="/#studie">případových studiích</a>.</p>
+  <p class="muted" style="margin-top:24px">${nb("Exteriérové a interiérové 3D vizualizace a průmyslové areály z let " + Math.min(...WORK.map(w => w.y).filter(Boolean)) + "–" + Math.max(...WORK.map(w => w.y).filter(Boolean)) + ". Letecké záběry a produktové vizualizace najdete u")} <a href="/#sluzby">služeb</a>, ${nb("celé sady obrázků na stránkách")} <a href="/projekty">projektů</a>.</p>
 </section>`;
-  return page({ path: "/portfolio", cur: "/portfolio", title: "Galerie 3D vizualizací | Archivisual", desc: `Galerie ${WORK.length} architektonických 3D vizualizací: exteriéry, interiéry, letecké nadhledy a produkty. Studio Archivisual, Praha.`, body, schema: ld(crumbsLd([["Úvod", "/"], ["Práce", "/portfolio"]])) });
+  return page({ path: "/portfolio", cur: "/portfolio", title: "Galerie 3D vizualizací | Archivisual", desc: `Galerie ${MAIN.length} architektonických 3D vizualizací: exteriéry, interiéry a průmyslové areály. Studio Archivisual, Praha.`, body, schema: ld(crumbsLd([["Úvod", "/"], ["Práce", "/portfolio"]])) });
 }
 
 const groups = list => { const out = []; for (const g of list) { if (g[2] === "wide") out.push({ wide: g }); else { const l = out[out.length - 1]; if (l && l.items) l.items.push(g); else out.push({ items: [g] }); } } return out; };
@@ -393,7 +393,7 @@ await fs.copyFile("src/site.js", path.join(OUT, "assets/site.js"));
 if (sharp) { try {
   const shade = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></linearGradient></defs><rect width="1200" height="630" fill="url(#g)"/></svg>`);
   const [, , vw, vh] = LOGO.vb.split(/\s+/).map(Number); const lw = 300, lh = Math.round(lw * vh / vw);
-  const logo = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${LOGO.vb}" width="${lw}" height="${lh}"><path fill="#fff" d="${LOGO.d}"/>${LOGO.dot}</svg>`);
+  const logo = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${LOGO.vb}" width="${lw}" height="${lh}"><path fill="#fff" d="${LOGO.d}"/>${LOGO.dot ? `<circle cx="${LOGO.dot.cx}" cy="${LOGO.dot.cy}" r="${LOGO.dot.r}" fill="#C98A2E"/>` : ""}</svg>`);
   await write("img/og.jpg", await sharp(path.join(OUT, wBase(WORK[HERO[0]]) + "-2400.webp")).resize(1200, 630, { fit: "cover" }).composite([{ input: shade }, { input: logo, left: 56, top: 630 - lh - 50 }]).jpeg({ quality: 82 }).toBuffer());
 } catch (e) { console.warn("OG:", e.message); } }
 

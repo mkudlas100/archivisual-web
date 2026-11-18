@@ -39,6 +39,20 @@ export { PROJECTS };
 export const PROJECT_PAGES = PROJECTS.filter(p => p.slug).map(p => ({ ...p, items: WORK.map((w, i) => [w, i]).filter(([w]) => w.p === p) }))
   .sort((a, b) => (b.items.some(([w]) => w.home) - a.items.some(([w]) => w.home)) || (b.y - a.y) || b.items.length - a.items.length);
 
+// Práce (úvod i /portfolio): jen exteriéry a interiéry, občas průmyslová hala z většího projektu.
+const BEST_INT = ["Kosicka", "Milano", "Vinohrady", "KrizikovaB11", "Smolnice", "CarneaInterior", "Zbuzany", "BusDepot", "Iris1Most", "CentrumPankrac"];
+const idx = f => WORK.map((w, i) => f(w) ? i : -1).filter(i => i >= 0);
+const sp = ids => spread(ids.map(i => WORK[i])).map(w => WORK.indexOf(w));
+const rank = w => { const k = BEST_INT.findIndex(n => w.p.id.endsWith("_" + n)); return k < 0 ? 99 : k; };
+const E = idx(w => w.c === "ext"), I = idx(w => w.c === "int").sort((a, b) => rank(WORK[a]) - rank(WORK[b]) || (WORK[b].y - WORK[a].y));
+const big = new Set(Object.entries(ALL.reduce((o, w) => (w.c === "ind" && (o[w.p.id] = (o[w.p.id] || 0) + 1), o), {})).filter(([, n]) => n >= 2).map(([id]) => id));
+const N = sp(idx(w => w.c === "ind" && big.has(w.p.id)));
+const Ip = sp(I.slice(0, 30)).concat(I.slice(30));
+export const MAIN = []; { let e = 0, i = 0, n = 0; while (e < E.length || i < Ip.length || n < N.length) { for (let k = 0; k < 2 && e < E.length; k++) MAIN.push(E[e++]); if (i < Ip.length) MAIN.push(Ip[i++]); if (n < N.length && (MAIN.length >= 18 && MAIN.length % 9 < 3 || (e >= E.length && i >= Ip.length))) MAIN.push(N[n++]); } }
+export const HOME_N = 24;
+// ukázky u služeb (index = pořadí v SERVICES)
+export const EXTRA = { 3: { id: "letecke", items: spread(ALL.filter(w => w.c === "air")).map(w => WORK.indexOf(w)) }, 6: { id: "produkty", items: spread(ALL.filter(w => w.c === "prod" || w.c === "exp")).map(w => WORK.indexOf(w)) }, 7: { id: "schemata", items: spread(ALL.filter(w => w.c === "sch")).map(w => WORK.indexOf(w)) } };
+
 // úvodní prolínačka: vybrané záběry z top 10
 const pick = f => WORK.findIndex(w => w.f.startsWith(f));
 export const HERO = ["2026_Oikoi_Barrandov_EXT_08", "2026_Oikoi_Kreslice_EXT_05", "2026_JKH_NaLukach_EXT_02", "2025_Archum_VRT_EXT_03_v03", "2024_Krupa_Smolnice_EXT_05"].map(pick).filter(i => i >= 0);
@@ -47,10 +61,10 @@ export const SERVICES = [
   ["Exteriérové vizualizace", "Budovy a krajina ve všech fázích projektu, od soutěžního návrhu po prodejní kampaň. Hlídáme každý detail i denní dobu, která stavbě nejvíc sluší.", [["/portfolio#ext", "Ukázky exteriérů"], ["/studie/kosicka-courtyard", "Studie Košická Courtyard"]]],
   ["Interiérové vizualizace", "Realistické interiéry, ve kterých si klient představí, jak bude prostor žít. Materiály, světlo a vybavení podle návrhu architekta.", [["/portfolio#int", "Ukázky interiérů"], ["/studie/vrsovice-interier", "Studie bytu ve Vršovicích"]]],
   ["Video prezentace a animace", "Průlety, průchody a krátká videa pro web a sociální sítě, která srozumitelně vysvětlí celý projekt.", []],
-  ["Letecké záběry a fotozákresy", "Pořídíme letecké snímky pozemku a stavbu do nich přesně zakreslíme. Víme, jaké záběry pro zákres potřebujete.", [["/portfolio#air", "Ukázky nadhledů"], ["/fotozakres-stavby", "Jak vzniká fotozákres"]]],
+  ["Letecké záběry a fotozákresy", "Pořídíme letecké snímky pozemku a stavbu do nich přesně zakreslíme. Víme, jaké záběry pro zákres potřebujete.", [["/fotozakres-stavby", "Jak vzniká fotozákres"]]],
   ["Virtuální prohlídky", "Z vizualizací vytvoříme 360° interaktivní prohlídku. Klient si prostory projde online z pohodlí domova.", [["/virtualni-prohlidka-360", "Jak vzniká prohlídka 360°"]]],
   ["Virtuální staging", "Prázdný nebo zastaralý byt zařídíme ve vizualizaci, aby si kupující dokázal představit svůj budoucí domov.", [["/virtualni-staging", "Článek o virtuálním stagingu"]]],
-  ["Produktové vizualizace", "Nábytek, svítidla i expozice v kvalitě pro katalogy, prezentace a e-shopy.", [["/portfolio#prod", "Ukázky produktů"], ["/projekty/hodinky-krr", "Projekt Hodinky KRR"], ["/jak-3d-vizualizace-meni-svet", "Článek o produktových vizualizacích"]]],
+  ["Produktové vizualizace", "Nábytek, svítidla i expozice v kvalitě pro katalogy, prezentace a e-shopy.", [["/projekty/hodinky-krr", "Hodinky KRR"], ["/projekty/hi-tech-garaz", "Hi-tech garáž"], ["/projekty/expozice-skoda-enyaq", "Expozice Škoda"], ["/jak-3d-vizualizace-meni-svet", "Článek o produktových vizualizacích"]]],
   ["Architektonické soutěže a studie", "Vizualizace, které pomáhají vyhrávat soutěže a přesvědčit investora o hodnotě návrhu.", []],
 ];
 
