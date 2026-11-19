@@ -455,10 +455,18 @@ export const PROJECTS = [
 "y": 2026
 },
 {
+"id": "2026_Arep_Ladvi",
+"t": "Kulturní dům Ládví",
+"slug": "kulturni-dum-ladvi",
+"desc": "Proměna náměstí před Kulturním domem Ládví. Stromy, pergola s popínavou zelení, fontána a dětské hřiště dělají z rozpáleného prostranství místo, kde se lidé rádi zastaví. Letní den, kavárenské stolky a hrající si děti.",
+"k": "AREP",
+"y": 2026
+},
+{
 "id": "2026_Arep_BusDepot",
 "t": "Autobusové depo",
 "slug": "autobusove-depo",
-"desc": "Moderní depo s dřevěnými konstrukcemi, zelenými plochami a vodní nádrží. Odpolední slunce, lidé na náměstí a světlé haly uvnitř ukazují, že i technická stavba může být příjemné místo.",
+"desc": "Moderní depo s dřevěnými konstrukcemi, zelenými plochami a vodní nádrží. Odpolední slunce, lidé pod dřevěným podloubím a světlé haly uvnitř ukazují, že i technická stavba může být příjemné místo.",
 "k": "AREP",
 "y": 2026
 },
@@ -875,8 +883,8 @@ export const PHOTOS = [
 "top": false
 },
 {
-"f": "2026_Arep_BusDepot_EXT_02_v01",
-"p": "2026_Arep_BusDepot",
+"f": "2026_Arep_Ladvi_EXT_01_v01",
+"p": "2026_Arep_Ladvi",
 "y": 2026,
 "k": "AREP",
 "c": "ext",
@@ -891,24 +899,24 @@ export const PHOTOS = [
 "top": false
 },
 {
-"f": "2026_Arep_BusDepot_EXT_05_v01",
-"p": "2026_Arep_BusDepot",
+"f": "2026_Arep_Ladvi_EXT_02_v01",
+"p": "2026_Arep_Ladvi",
 "y": 2026,
 "k": "AREP",
 "c": "ext",
 "top": false
 },
 {
-"f": "2026_Arep_BusDepot_EXT_06_v01",
-"p": "2026_Arep_BusDepot",
+"f": "2026_Arep_Ladvi_EXT_03_v01",
+"p": "2026_Arep_Ladvi",
 "y": 2026,
 "k": "AREP",
 "c": "ext",
 "top": false
 },
 {
-"f": "2026_Arep_BusDepot_EXT_07_v01",
-"p": "2026_Arep_BusDepot",
+"f": "2026_Arep_Ladvi_EXT_04_v01",
+"p": "2026_Arep_Ladvi",
 "y": 2026,
 "k": "AREP",
 "c": "ext",

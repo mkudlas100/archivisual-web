@@ -6,8 +6,14 @@ function $(s,c){return (c||d).querySelector(s)}function $$(s,c){return Array.pro
 
 /* preloader (jen úvod, jednou za návštěvu) */
 var pre=$("#pre");
+/* logo vlevo nahoře: rozjede se z malého čtverce po načtení (úvod vždy po preloaderu, jinde jen na první stránce návštěvy) */
+var hl=$("header .logo .wm")||$(".logo .wm");
+function logoIn(){if(!hl||reduce)return;hl.classList.remove("anim");void hl.getBoundingClientRect();hl.classList.add("anim");clearTimeout(hl._t);hl._t=setTimeout(function(){hl.classList.remove("anim")},3200)}
+var firstLogo=false;try{firstLogo=sessionStorage.getItem("av-logo")!=="1";sessionStorage.setItem("av-logo","1")}catch(e){}
 if(pre){var seen=false;try{seen=sessionStorage.getItem("av-pre")==="1";sessionStorage.setItem("av-pre","1")}catch(e){}
-  if(reduce||seen){pre.remove()}else{var n=$("#preN"),t0=performance.now(),D=2300;(function tick(t){var k=Math.min(1,(t-t0)/D);n.textContent=String(Math.round(k*k*(3-2*k)*100)).padStart(3,"0");if(k<1)requestAnimationFrame(tick);else{pre.classList.add("done");setTimeout(function(){pre.remove()},1100)}})(t0)}}
+  if(hl&&!reduce)hl.classList.add("wait");
+  if(reduce||seen){pre.remove();if(hl)hl.classList.remove("wait");setTimeout(logoIn,150)}else{var n=$("#preN"),t0=performance.now(),D=1100;(function tick(t){var k=Math.min(1,(t-t0)/D);n.textContent=String(Math.round(k*k*(3-2*k)*100)).padStart(3,"0");if(k<1)requestAnimationFrame(tick);else{pre.classList.add("done");setTimeout(function(){if(hl)hl.classList.remove("wait");logoIn()},650);setTimeout(function(){pre.remove()},1100)}})(t0)}}
+else if(firstLogo)logoIn();
 
 /* menu */
 var menu=$("#menu"),mb=$("#menuBtn");
@@ -15,7 +21,7 @@ function toggleMenu(o){menu.classList.toggle("open",o);mb.setAttribute("aria-exp
 if(menu){mb.onclick=function(){toggleMenu(true)};$("#menuClose").onclick=function(){toggleMenu(false)};$$("nav a",menu).forEach(function(a){a.addEventListener("click",function(){toggleMenu(false)})})}
 
 /* logo: po načtení animace, při najetí znovu „zaostří“ */
-$$(".logo .wm").forEach(function(w){var l=w.parentNode;l.addEventListener("mouseenter",function(){w.classList.remove("refocus");void w.getBoundingClientRect();w.classList.add("refocus")})});
+
 /* hlavička: pevné pozadí po odscrollování */
 var hdrEl=$("#top");function hdr(){hdrEl&&hdrEl.classList.toggle("solid",scrollY>30)}addEventListener("scroll",hdr,{passive:true});hdr();
 /* kurzor + náhled u seznamu */

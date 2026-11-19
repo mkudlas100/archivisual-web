@@ -3,7 +3,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { SITE, CATS, WORK, MAIN, HOME_N, EXTRA, HERO, SERVICES, CLIENTS, TESTIMONIALS, PROJECT_PAGES } from "./src/data.mjs";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { OLD_POSTS } from "./src/posts-old.mjs";
 import { NEW_POSTS } from "./src/posts-new.mjs";
 import { STUDIES } from "./src/studies.mjs";
@@ -93,7 +93,7 @@ const ld = (...nodes) => `<script type="application/ld+json">${JSON.stringify({ 
 const crumbsLd = items => ({ "@type": "BreadcrumbList", itemListElement: items.map(([n, u], i) => ({ "@type": "ListItem", position: i + 1, name: n, item: SITE.url + u })) });
 
 /* ---------- šablona ---------- */
-const NAV = [["/portfolio", "Práce"], ["/projekty", "Projekty"], ["/#studie", "Studie"], ["/#sluzby", "Služby"], ["/blog-archivisual", "Blog"]];
+const NAV = [["/portfolio", "Práce"], ["/projekty", "Projekty"], ["/#studie", "Studie"], ["/#sluzby", "Služby"], ["/o-nas", "O nás"], ["/blog-archivisual", "Blog"]];
 const CTA = "Poptat vizualizaci";
 async function page({ path: p, title, desc, body, schema = "", image = "/img/og.jpg", home = false, cur = "", dark = false }) {
   const canonical = SITE.url + (p === "/" ? "/" : p);
@@ -114,10 +114,10 @@ ${schema}
 </head>
 <body${dark ? ' class="over-dark"' : ""}>
 <a class="skip" href="#obsah">Přeskočit na obsah</a>
-${home ? '<div class="pre" id="pre" aria-hidden="true">' + logoSvg("pre-logo anim") + '<span>Vizualizace od roku ' + SITE.since + '</span><b id="preN">000</b></div>' : ""}
+${home ? '<div class="pre" id="pre" aria-hidden="true"><span>Vizualizace od roku ' + SITE.since + '</span><b id="preN">000</b></div>' : ""}
 <div class="cur" id="cur" aria-hidden="true"><em>Zobrazit</em></div>
 <header class="top wrap" id="top">
-  <a class="logo" href="/" aria-label="Archivisual – úvod">${logoSvg("anim")}</a>
+  <a class="logo" href="/" aria-label="Archivisual – úvod">${logoSvg()}</a>
   <nav class="hnav" aria-label="Hlavní">
     ${NAV.map(([u, l]) => `<a class="hl" href="${u}"${cur === u ? ' aria-current="page"' : ""}>${l}</a>`).join("")}
     <a class="hl" href="#kontakt">${CTA}</a>
@@ -145,7 +145,7 @@ ${contact()}
 <footer class="site wrap">
   <div class="f-brand"><a href="/" class="logo" aria-label="Archivisual – úvod">${logoSvg()}</a><p>3D vizualizace od roku ${SITE.since}</p></div>
   <div class="f-legal">${SITE.company ? `<p>${esc(SITE.company.name)}<br>IČO ${esc(SITE.company.ico)}<br>${esc(SITE.company.seat)}${SITE.company.register ? "<br>" + esc(SITE.company.register) : ""}</p>` : ""}<p>Ateliér: ${SITE.address.street}, ${SITE.address.zip} ${SITE.address.city}<br>${SITE.email}</p></div>
-  <nav aria-label="Patička"><a href="/portfolio">Práce</a><a href="/projekty">Projekty</a><a href="/blog-archivisual">Blog</a><a href="/kontakt">Kontakt</a><a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>${SITE.social.map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${n}</a>`).join("")}</nav>
+  <nav aria-label="Patička"><a href="/portfolio">Práce</a><a href="/projekty">Projekty</a><a href="/o-nas">O nás</a><a href="/blog-archivisual">Blog</a><a href="/kontakt">Kontakt</a><a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>${SITE.social.map(([n, u]) => `<a href="${u}" target="_blank" rel="noopener">${n}</a>`).join("")}</nav>
   <p class="f-copy">© ${new Date().getFullYear()} Archivisual</p>
 </footer>
 <div class="peek" id="peek" aria-hidden="true"></div>
@@ -354,8 +354,31 @@ async function project(p, idx) {
     schema: ld(crumbsLd([["Úvod", "/"], ["Projekty", "/projekty"], [p.t, url]]), { "@type": "CreativeWork", name: p.t, description: p.desc, ...(p.y ? { dateCreated: String(p.y) } : {}), creator: { "@id": SITE.url + "/#studio" }, ...(p.k ? { sourceOrganization: { "@type": "Organization", name: p.k } } : {}), image: p.items.map(([w]) => SITE.url + "/" + wBase(w) + ".jpg") }) });
 }
 
+
+const TEAM_FOTO = Object.fromEntries(SITE.team.map(t => [t.foto, ["jpg", "jpeg", "png", "webp"].map(e => `team/${t.foto}.${e}`).find(f => existsSync(f))]));
+async function teamPic(t) {
+  const src = TEAM_FOTO[t.foto];
+  if (!src) return `<div class="tm-ph" aria-hidden="true"><span>${t.name.split(" ").map(x => x[0]).join("")}</span></div>`;
+  for (const w of [480, 960]) await write(`img/tym/${t.foto}-${w}.webp`, await sharp(src).rotate().resize(w, Math.round(w * 1.25), { fit: "cover", position: "attention" }).webp({ quality: 82 }).toBuffer());
+  return `<img src="/img/tym/${t.foto}-960.webp" srcset="/img/tym/${t.foto}-480.webp 480w, /img/tym/${t.foto}-960.webp 960w" sizes="(max-width:700px) 100vw, 40vw" width="960" height="1200" alt="${esc(t.name)}, ${esc(t.role.toLowerCase())} studia Archivisual" loading="lazy" decoding="async">`;
+}
+async function teamBlock() {
+  return `<div class="team">${(await Promise.all(SITE.team.map(async t => `<article class="tm"><figure>${await teamPic(t)}</figure><h3>${esc(t.name)}</h3><p class="tm-role">${esc(t.role)}</p><p>${nb(esc(t.bio))}</p><p class="tm-c"><a href="tel:${t.tel}">${t.telL}</a><a href="mailto:${t.email}">${t.email}</a></p></article>`))).join("")}</div>`;
+}
+
+async function about() {
+  const body = `<section class="wrap" style="padding-top:calc(130px + env(safe-area-inset-top,0px))"><nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>O nás</span></nav>
+<h1 class="big">Kdo stojí za Archivisualem</h1>
+<div class="two-col" style="margin-top:clamp(28px,4vw,56px)"><p class="kick">Studio od roku ${SITE.since}</p><div><p class="big" style="font-size:var(--s-l);max-width:34ch">${nb(`Archivisual je studio architektonických vizualizací v pražském Karlíně. Od roku ${SITE.since} ukazujeme developerům, architektům a designérům, jak budou jejich stavby a interiéry vypadat, dřív než se postaví.`)}</p><p style="margin-top:20px;max-width:60ch">${nb("Spojuje nás pohled 3D artisty a architekta. Proto u nás nevznikají jen hezké obrázky, ale vizualizace, které sedí s projektem: správné měřítko, materiály, světlo a okolí. Komunikujete přímo s námi, bez prostředníků, od prvních podkladů po poslední úpravu.")}</p></div></div></section>
+<section class="wrap" style="padding-top:0">${await teamBlock()}</section>
+<section class="wrap"><div class="two-col"><h2>Jak pracujeme</h2><ol class="steps-mini"><li><b>Podklady</b><span>${nb("Pošlete výkresy, model nebo skicu. Řekneme cenu a termín.")}</span></li><li><b>Pohledy a světlo</b><span>${nb("Navrhneme záběry a náladu, schválíte je na náhledech.")}</span></li><li><b>Detaily a výstup</b><span>${nb("Doladíme materiály, zeleň a lidi, předáme vizualizace v plném rozlišení.")}</span></li></ol></div></section>
+<section class="wrap" style="padding-top:0"><div class="two-col"><h2>Pracovali jsme pro</h2><div class="clients">${CLIENTS.map(([n, u]) => u ? `<a href="${u}" target="_blank" rel="noopener">${n}</a>` : `<span>${n}</span>`).join("")}</div></div></section>`;
+  return page({ path: "/o-nas", cur: "/o-nas", title: "O nás – kdo stojí za Archivisualem | Archivisual", desc: `Studio Archivisual: 3D artist Matěj Kudlička a architekt Michele Corradini. Architektonické vizualizace od roku ${SITE.since}, ateliér v Praze 8 – Karlíně.`, body, schema: ld(crumbsLd([["Úvod", "/"], ["O nás", "/o-nas"]]), { "@type": "AboutPage", name: "O nás", url: SITE.url + "/o-nas", about: { "@id": SITE.url + "/#studio" }, mainEntity: SITE.team.map(t => ({ "@type": "Person", name: t.name, jobTitle: t.role, email: t.email, worksFor: { "@id": SITE.url + "/#studio" } })) }) });
+}
+
 async function kontakt() {
-  const body = `<section class="wrap" style="padding-top:calc(130px + env(safe-area-inset-top,0px));padding-bottom:0"><nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>Kontakt</span></nav><h1 class="big">Kontakt</h1><p style="margin-top:16px;font-size:var(--s-l);font-weight:300">${nb("Ateliér v pražském Karlíně. Napište nám, zavolejte, nebo pošlete podklady přes formulář.")}</p></section>`;
+  const body = `<section class="wrap" style="padding-top:calc(130px + env(safe-area-inset-top,0px));padding-bottom:0"><nav class="crumbs" aria-label="Drobečková navigace"><a href="/">Úvod</a><span>/</span><span>Kontakt</span></nav><h1 class="big">Kontakt</h1><p style="margin-top:16px;font-size:var(--s-l);font-weight:300">${nb("Ateliér v pražském Karlíně. Napište nám, zavolejte, nebo pošlete podklady přes formulář.")}</p></section>
+<section class="wrap" style="padding-bottom:0"><div class="work-head"><h2 style="font-size:var(--s-xl)">S kým budete mluvit</h2><a class="btn" href="/o-nas">Více o nás</a></div><p style="max-width:60ch;margin-bottom:clamp(24px,3vw,40px)">${nb(`Jsme malé studio, takže vám odpovídá přímo ten, kdo na vizualizacích pracuje. Vizualizace děláme od roku ${SITE.since}.`)}</p>${await teamBlock()}</section>`;
   return page({ path: "/kontakt", cur: "/kontakt", title: "Kontakt | Archivisual", desc: `Kontakt na studio Archivisual: ${SITE.email}, ${SITE.phones.map(p => p.label).join(", ")}, ${SITE.address.street}, Praha 8 – Karlín.`, body, schema: ld(crumbsLd([["Úvod", "/"], ["Kontakt", "/kontakt"]])) });
 }
 
@@ -405,11 +428,12 @@ for (const p of POSTS) await write(`${p.slug}.html`, await post(p));
 await write("projekty.html", await projectsIndex());
 for (const [i, p] of PROJECT_PAGES.entries()) await write(`projekty/${p.slug}.html`, await project(p, i));
 await write("kontakt.html", await kontakt());
+await write("o-nas.html", await about());
 await write("ochrana-osobnich-udaju.html", await privacy());
 await write("dekujeme.html", await simple("/dekujeme", "Děkujeme", "Děkujeme, poptávka je odeslaná", "Ozveme se vám s cenou a termínem. Pokud spěcháte, zavolejte nám."));
 await write("404.html", await simple("/404", "Stránka nenalezena", "Tuhle stránku jsme nenašli", "Možná se přesunula. Zkuste galerii, blog, nebo nám napište."));
 
-const urls = ["/", "/portfolio", "/projekty", ...PROJECT_PAGES.map(pUrl), "/kontakt", "/ochrana-osobnich-udaju", ...STUDIES.map(s => "/studie/" + s.slug), "/blog-archivisual", ...POSTS.map(p => "/" + p.slug)];
+const urls = ["/", "/portfolio", "/projekty", ...PROJECT_PAGES.map(pUrl), "/kontakt", "/o-nas", "/ochrana-osobnich-udaju", ...STUDIES.map(s => "/studie/" + s.slug), "/blog-archivisual", ...POSTS.map(p => "/" + p.slug)];
 await write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE.url}${u}</loc><lastmod>${BUILD_DATE}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 await write("robots.txt", NOINDEX ? "User-agent: *\nDisallow: /\n" : `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
 await write("llms.txt", `# Archivisual\n\n> Pražské studio architektonických 3D vizualizací (od roku ${SITE.since}), Šaldova 544/6, Praha 8 – Karlín. Exteriérové a interiérové vizualizace, animace, letecké záběry a fotozákresy, virtuální prohlídky 360°, produktové vizualizace a developerský servis.\n\n- Kontakt: ${SITE.email}, ${SITE.phones.map(p => p.label + " (" + p.who + ")").join(", ")}\n- [Galerie](${SITE.url}/portfolio)\n${STUDIES.map(s => `- [Studie: ${s.title}](${SITE.url}/studie/${s.slug}): ${s.desc}`).join("\n")}\n\n## Blog\n${POSTS.map(p => `- [${p.title}](${SITE.url}/${p.slug}): ${p.desc}`).join("\n")}\n`);

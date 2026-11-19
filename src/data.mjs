@@ -18,8 +18,9 @@ export const SITE = {
   // Provozovatel pro patičku a zásady ochrany osobních údajů – doplnit podle rejstříku (čeká na klienta)
   company: null, // např. { name: "…", ico: "…", seat: "…", register: "…" }
   team: [
-    { name: "Matěj Kudlička", role: "3D artist", email: "kudlicka@archivisual.cz" },
-    { name: "Michele Corradini", role: "Architekt", email: "corradini@archivisual.cz" },
+    // Fotka: team/<foto>.jpg (na výšku 4:5). Dokud chybí, ukazují se iniciály.
+    { name: "Matěj Kudlička", role: "3D artist", email: "kudlicka@archivisual.cz", tel: "+420724589403", telL: "+420 724 589 403", foto: "matej", bio: "Stará se o scénu, světlo a výsledný obraz. Od prvního modelu po poslední retuš hlídá, aby vizualizace působila jako fotka hotové stavby." },
+    { name: "Michele Corradini", role: "Architekt", email: "corradini@archivisual.cz", tel: "+420608776171", telL: "+420 608 776 171", foto: "michele", bio: "Čte projekt očima architekta. Hlídá měřítko, materiály a souvislosti s okolím, aby obraz odpovídal tomu, co se opravdu postaví." },
   ],
 };
 

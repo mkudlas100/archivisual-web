@@ -331,10 +331,10 @@ footer.site nav{display:flex;gap:10px 22px;flex-wrap:wrap}
 .svc-gal figcaption{font-size:.78rem;padding-top:4px}
 /* logo: hledáček zaostří, nápis se vynoří, tečka blikne jako nahrávání */
 .wm .c,.wm .w,.wm .t,.wm .dot{transform-box:fill-box;transform-origin:center}
-.wm.anim .c1{animation:av-c1 1.8s var(--ease) both}.wm.anim .c2{animation:av-c2 1.8s var(--ease) both}.wm.anim .c3{animation:av-c3 1.8s var(--ease) both}.wm.anim .c4{animation:av-c4 1.8s var(--ease) both}
-.wm.anim .w{animation:av-w .9s var(--ease) 1.05s both}
-.wm.anim .t{animation:av-t .8s var(--ease) 1.4s both}
-.wm.anim .dot{animation:av-dot 1.6s steps(1) 1.6s both}
+.wm.anim .c1{animation:av-c1 1.5s var(--ease) both}.wm.anim .c2{animation:av-c2 1.5s var(--ease) both}.wm.anim .c3{animation:av-c3 1.5s var(--ease) both}.wm.anim .c4{animation:av-c4 1.5s var(--ease) both}
+.wm.anim .w{animation:av-w .8s var(--ease) .85s both}
+.wm.anim .t{animation:av-t .7s var(--ease) 1.15s both}
+.wm.anim .dot{animation:av-dot 1.6s steps(1) 1.3s both}
 @keyframes av-c1{0%{transform:translate(45px,12.9px) scale(.6);opacity:0}18%{transform:translate(45px,12.9px);opacity:1}38%{transform:translate(45px,12.9px)}88%{transform:translate(-0.54px,-0.39px)}100%{transform:none}}
 @keyframes av-c2{0%{transform:translate(-45px,12.9px) scale(.6);opacity:0}18%{transform:translate(-45px,12.9px);opacity:1}38%{transform:translate(-45px,12.9px)}88%{transform:translate(0.54px,-0.39px)}100%{transform:none}}
 @keyframes av-c3{0%{transform:translate(45px,-12.9px) scale(.6);opacity:0}18%{transform:translate(45px,-12.9px);opacity:1}38%{transform:translate(45px,-12.9px)}88%{transform:translate(-0.54px,0.39px)}100%{transform:none}}
@@ -342,13 +342,7 @@ footer.site nav{display:flex;gap:10px 22px;flex-wrap:wrap}
 @keyframes av-w{0%{opacity:0;transform:translateY(3px) scale(.97);filter:blur(1.2px)}100%{opacity:1;transform:none;filter:none}}
 @keyframes av-t{0%{opacity:0;transform:translateX(-4px)}100%{opacity:1;transform:none}}
 @keyframes av-dot{0%{opacity:0}25%{opacity:1}45%{opacity:0}65%{opacity:1}100%{opacity:1}}
-.wm.refocus .c1{animation:av-f1 .7s var(--ease)}.wm.refocus .c2{animation:av-f2 .7s var(--ease)}.wm.refocus .c3{animation:av-f3 .7s var(--ease)}.wm.refocus .c4{animation:av-f4 .7s var(--ease)}.wm.refocus .dot{animation:av-dot 1.2s steps(1)}
-@keyframes av-f1{40%{transform:translate(-2px,-2px)}}@keyframes av-f2{40%{transform:translate(2px,-2px)}}@keyframes av-f3{40%{transform:translate(-2px,2px)}}@keyframes av-f4{40%{transform:translate(2px,2px)}}
-.pre{flex-wrap:wrap;align-content:space-between}
-.pre .pre-logo{position:absolute;left:50%;top:46%;width:min(70vw,640px);height:auto;transform:translate(-50%,-50%);color:var(--ink,#17191B)}
-.pre .pre-logo.anim .c1,.pre .pre-logo.anim .c2,.pre .pre-logo.anim .c3,.pre .pre-logo.anim .c4{animation-duration:2.2s}
 @media (prefers-reduced-motion:reduce){.wm *{animation:none!important}}
-.pre .pre-logo.anim .w{animation-delay:1.3s}.pre .pre-logo.anim .t{animation-delay:1.7s}.pre .pre-logo.anim .dot{animation-delay:1.9s}
 
 .pgal .scol{columns:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,1.6vw,24px)}
 @media (max-width:900px){.pgal .scol{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -356,3 +350,37 @@ footer.site nav{display:flex;gap:10px 22px;flex-wrap:wrap}
 .pgal .scol figure{margin:0;overflow:hidden}
 .pgal .scol img{aspect-ratio:3/2;height:auto;object-fit:cover;transition:transform .8s var(--ease)}
 .pgal .scol figure:hover img{transform:scale(1.03)}
+/* tým */
+.team{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,3vw,48px)}
+@media (max-width:700px){.team{grid-template-columns:minmax(0,1fr)}}
+.tm figure{margin:0 0 18px;aspect-ratio:4/5;overflow:hidden;background:var(--line)}
+.tm img{width:100%;height:100%;object-fit:cover;filter:grayscale(.15);transition:transform 1s var(--ease),filter .6s}
+.tm:hover img{transform:scale(1.03);filter:none}
+.tm-ph{width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg,var(--line),var(--paper))}
+.tm-ph span{font-size:var(--s-xxl);font-weight:200;font-variation-settings:"wdth" 125;letter-spacing:-.04em;color:var(--mute)}
+.tm h3{font-size:var(--s-l);font-weight:400}
+.tm-role{color:#C98A2E;font-size:var(--s-s);margin:4px 0 12px}
+.tm p{max-width:46ch}
+.tm-c{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:14px;font-size:var(--s-s)}
+.tm-c a{color:inherit;border-bottom:1px solid currentColor;text-decoration:none}
+.steps-mini{list-style:none;margin:0;padding:0;display:grid;gap:22px;counter-reset:s}
+.steps-mini li{display:grid;grid-template-columns:3ch 1fr;gap:4px 16px;counter-increment:s}
+.steps-mini li::before{content:"0" counter(s);grid-row:span 2;color:var(--mute);font-variant-numeric:tabular-nums}
+.steps-mini b{font-weight:400;font-size:var(--s-l)}
+.steps-mini span{color:var(--mute);max-width:52ch}
+
+/* logo čeká na konec preloaderu */
+.wm.wait .c,.wm.wait .w,.wm.wait .t,.wm.wait .dot{opacity:0}
+/* najetí myší: logo tepe i s rámečky */
+.logo .wm{transform-origin:left center}
+.logo:hover .wm:not(.anim),.logo:focus-visible .wm:not(.anim){animation:av-beat 1.15s var(--ease) infinite}
+.logo:hover .wm:not(.anim) .c1,.logo:focus-visible .wm:not(.anim) .c1{animation:av-b1 1.15s var(--ease) infinite}
+.logo:hover .wm:not(.anim) .c2,.logo:focus-visible .wm:not(.anim) .c2{animation:av-b2 1.15s var(--ease) infinite}
+.logo:hover .wm:not(.anim) .c3,.logo:focus-visible .wm:not(.anim) .c3{animation:av-b3 1.15s var(--ease) infinite}
+.logo:hover .wm:not(.anim) .c4,.logo:focus-visible .wm:not(.anim) .c4{animation:av-b4 1.15s var(--ease) infinite}
+.logo:hover .wm:not(.anim) .dot{animation:av-dot 1.15s steps(1) infinite}
+@keyframes av-beat{0%,60%,100%{transform:none}15%{transform:scale(1.05)}30%{transform:scale(.985)}45%{transform:scale(1.025)}}
+@keyframes av-b1{0%,60%,100%{transform:none}15%{transform:translate(-2.4px,-1.8px)}30%{transform:translate(.8px,.6px)}45%{transform:translate(-1.3px,-1px)}}
+@keyframes av-b2{0%,60%,100%{transform:none}15%{transform:translate(2.4px,-1.8px)}30%{transform:translate(-.8px,.6px)}45%{transform:translate(1.3px,-1px)}}
+@keyframes av-b3{0%,60%,100%{transform:none}15%{transform:translate(-2.4px,1.8px)}30%{transform:translate(.8px,-.6px)}45%{transform:translate(-1.3px,1px)}}
+@keyframes av-b4{0%,60%,100%{transform:none}15%{transform:translate(2.4px,1.8px)}30%{transform:translate(-.8px,-.6px)}45%{transform:translate(1.3px,1px)}}
